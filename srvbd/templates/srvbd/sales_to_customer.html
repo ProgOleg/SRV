@@ -2,7 +2,7 @@
 {% load static %}
 {% block content %}
 	
-	<script type="text/javascript" src="{% static 'srvbd/js/sale_to_customer.js' %}"></script>
+	<script type="text/javascript" src="{% static 'srvbd/js/sales_to_customer.js' %}"></script>
 	<form>
 		<div class="container">
 			<div class="row">
@@ -34,6 +34,7 @@
     			<div class="col-md-4">
 					<label for="select_applience">Выберите тип устройства:</label>
     				{{specification_filter.select_applience}}
+    				<datalist id="select_applience"></datalist>
     			</div>
 			</div>
 			<div class="row justify-content-between">
@@ -44,6 +45,7 @@
     			<div class="col-md-4">
     				<label for="select_type_sparpart">Выберите тип запчасти:</label>
     				{{specification_filter.select_type_sparpart}}
+    				<datalist id="select_type_sparpart"></datalist>
     			</div>
 			</div>
 			<div class="row justify-content-between">
@@ -54,6 +56,7 @@
     			<div class="col-md-4">
     				<label for="select_manufacturer">Выберите производителя:</label>
     				{{specification_filter.select_manufacturer}}
+    				<datalist id="select_manufacturer"></datalist>
     			</div>
 			</div>
 			<div class="row justify-content-end">

@@ -36,8 +36,10 @@ urlpatterns = [
     path('sales_to_customer/<int:invoice_id>/',views.SalesToCustomer.as_view(),name='sales_to_customer_url'),
     #TEST
     path('test/',views.get_exchange_rates_privat24,name="test_url"),
-
-
+    # Выборка по "Тип устройства(select_applience)" для рендеринка <datalist> !!!ЖЕСТКО ОДИРОВАНЫЕ УРЛЫ В ФОРМЕ!!!
+    path('ajax_tools_select_applience/',views.data_list_select_appliances,name="option_select_applience"),
+    path('ajax_tools_select_type_sparpart/',views.data_list_select_type_sparpart,name="option_select_type_sparpart"),
+    path('ajax_tools_select_manufacturer/',views.data_list_select_manufacturer,name="option_select_manufacturer"),
 ]
 
 

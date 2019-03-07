@@ -375,7 +375,6 @@ def tools_ajax_add_part_set_list(request):
     if request.is_ajax():
         if request.method == 'GET':
             data = request.GET
-            print(data)
             if data.get('field')=="manufacturer":
                 item = list(Manufacturer.objects.filter(
                     manufacturer__istartswith = data.get('val')).values_list('manufacturer'))
@@ -477,13 +476,49 @@ class SalesToCustomer(View):
         return render(request,'srvbd/sales_to_customer.html',context)
 
 
+#Выборка по "Тип устройства(select_applience)" для рендеринка <datalist>
+def data_list_select_appliances(request):
+    if request.method =='GET' and request.is_ajax():
+        data = request.GET['val']
+        if data:
+            try:
+                obj = list(TypeAppliances.objects.filter(type_appliances__istartswith=data)[:100].values_list('type_appliances'))
+            except IndexError:
+                obj = []
+        else: obj = []
+        return JsonResponse(obj, safe=False)
 
+    return HttpResponse(status=404)
 
+#Выборкадля рендеринка <datalist>
+def data_list_select_type_sparpart(request):
+    if request.method=='GET' and request.is_ajax():
+        data = request.GET['val']
+        if data:
+            try:
+                obj = list(TypeSparPart.objects.filter(type_spar_part__istartswith=data)[:100].values_list('type_spar_part'))
+                return JsonResponse(obj, safe=False)
+            except IndexError:
+                obj = []
+        else: obj = []
+        return JsonResponse(obj, safe=False)
 
+    return HttpResponse(status=404)
 
+# Выборкадля рендеринка <datalist>
+def data_list_select_manufacturer(request):
+    if request.method=='GET' and request.is_ajax():
+        data = request.GET['val']
+        if data:
+            try:
+                obj = list(Manufacturer.objects.filter(manufacturer__istartswith=data).values_list('manufacturer'))
+            except IndexError:
+                obj =[]
+        else:
+            obj = []
+        return JsonResponse(obj, safe=False)
 
-
-
+    return HttpResponse(status=404)
 
 
 

@@ -5,9 +5,7 @@
 
 	<div class="container" id="main_div" data-ajax-url="{% url 'ajax_add_part_set_list_url' %}">
 		<form id="form_submit" action="{% url 'add_device_url' %}" method="post">
-			<h2>Добавить устройство в справочник:</h2>
 			{% csrf_token %}
-			<br>
 			<h3>Добавить девайс в справочник:</h3>
 			<br>
 			{% if form %}

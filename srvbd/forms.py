@@ -164,12 +164,17 @@ class CreateIncom(forms.ModelForm):
 
 
 
-#***__Создание прихода и добавление запчастей на склад__***
+#***__Создание прихода и добавление запчастей на склад__***!!!ЖЕСТКО ЗАКОДИРОВАНЫЕ УРЛЫ В ДАТА АТРИБУТЕ!!!
 class IncomInfoShipper(forms.Form):
-    select_applience = forms.CharField(required=False,widget=forms.TextInput(attrs={'list':"applience",'class':"form-control "}))
-    select_type_sparpart = forms.CharField(required=False,widget=forms.TextInput(attrs={'list': "type_sparpart",'class':"form-control",
-                                                                         'size':"5"}))
-    select_manufacturer = forms.CharField(required=False,widget=forms.TextInput(attrs={'list': "manufactuer",'class':"form-control "}))
+    select_applience = forms.CharField(required=False,
+                                       widget=forms.TextInput(attrs={'list':"select_applience",'class':"form-control",
+                                                                     'data-ajax_url':"/ajax_tools_select_applience/"}))
+    select_type_sparpart = forms.CharField(required=False,
+                                           widget=forms.TextInput(attrs={'list': "select_type_sparpart",'class':"form-control",
+                                                                         'data-ajax_url': "/ajax_tools_select_type_sparpart/"}))
+    select_manufacturer = forms.CharField(required=False,
+                                          widget=forms.TextInput(attrs={'list': "select_manufacturer",'class':"form-control",
+                                                                        'data-ajax_url':"/ajax_tools_select_manufacturer/"}))
 
 
 
