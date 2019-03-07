@@ -1,0 +1,136 @@
+{% extends 'srvbd/base.html' %}
+{% load static %}
+{% block content %}
+	
+	<script type="text/javascript" src="{% static 'srvbd/js/sale_to_customer.js' %}"></script>
+	<form>
+		<div class="container">
+			<div class="row">
+				<h3>Продажа запчастей клиенту</h3>
+			</div>
+			<hr>
+			<div class="row">
+				<h4>Клиент:</h2>
+			</div>
+			<dl class="row">
+				<dt class="col-sm-3">Фамилия:</dt>
+				<dd class="col-sm-9">{{person.last_name}}</dd>
+				<dt class="col-sm-3">Имя:</dt>
+				<dd class="col-sm-9">{{person.first_name}}</dd>
+				<dt class="col-sm-3">Отчесвто:</dt>
+				<dd class="col-sm-9">{{person.patronymic_name}}</dd>
+				<dt class="col-sm-3">Телефон:</dt>
+				<dd class="col-sm-9">{{person.tell}}</dd>
+			</dl>
+			<hr>
+			<div class="row">
+				<h4>Выберите запчасть</h4>
+			</div>
+			<div class="row justify-content-between">
+				<div class="col-md-6">
+    				<label for="name">Наименование:</label>
+    				{{detail_filter.name}}
+    			</div>
+    			<div class="col-md-4">
+					<label for="select_applience">Выберите тип устройства:</label>
+    				{{specification_filter.select_applience}}
+    			</div>
+			</div>
+			<div class="row justify-content-between">
+				<div class="col-md-6">
+					<label for="specification">Описаине:</label>
+    				{{detail_filter.specification}}
+    			</div>
+    			<div class="col-md-4">
+    				<label for="select_type_sparpart">Выберите тип запчасти:</label>
+    				{{specification_filter.select_type_sparpart}}
+    			</div>
+			</div>
+			<div class="row justify-content-between">
+				<div class="col-md-6">
+					<label for="part_num">Парт-номер произвоидетеля:</label>
+    				{{detail_filter.part_num}}
+    			</div>
+    			<div class="col-md-4">
+    				<label for="select_manufacturer">Выберите производителя:</label>
+    				{{specification_filter.select_manufacturer}}
+    			</div>
+			</div>
+			<div class="row justify-content-end">
+				<div class="col-md-1 col-md-offset-4 mt-4">
+		    		<button id="but_filter" class="btn btn-success" >Фильтр</button>
+		    	</div>
+		    </div>
+		    <br>
+		    <div class="row justify-content-center remoove">
+				<table  class="table table-striped table-bordered " id="filter_table" >
+		  			<thead class="thead-dark table-condensed table-bordered table-hover">
+		    			<tr>
+		    				<th scope="col">№ Id</th>
+		    				<th scope="col">Наим.</th>
+		     				<th scope="col">Партномер производ.</th>
+		      				<th scope="col">Описание</th>
+		      				<th scope="col">Тип запчасти</th>
+		      				<th scope="col">Вид устройства</th>
+		      				<th scope="col">Производитель</th>
+		              		<th scope="col">Приход</th>
+		              		<th scope="col">Количество</th>
+		              		<th scope="col">Стоимость</th>
+		              		<th scope="col">Дейсвие</th>
+		    			</tr>
+		  			</thead>
+		  			<tbody id="filter_table_body">
+
+		    		</tbody>
+		    	</table>
+	    	</div>
+	    	<div class="row justify-content-center remoove">
+	    	<br>
+			<table class="table table-striped table table-bordered" >
+	  			<thead class="thead-dark table-condensed table-bordered table-hover">
+	    			<tr>
+	      				<th scope="col">Наименование</th>
+	     		 		<th scope="col">Партномер производителя</th>
+	      				<th scope="col">Описание</th>
+	      				<th scope="col">Количество</th>
+	      				<th scope="col">Цена</th>
+	      				<th scope="col">Действие</th>
+	    			</tr>
+	  			</thead>
+		  			<tbody id="tbody_new_detail" data-form-action="">
+			    		
+					</tbody>
+	    	</table>
+	    	</div>
+		</div>
+	</form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends 'srvbd/base.html' %}
+{% load static %}
+{% block content %}
+
+	<div class="container">
+		<div class="row">
+      		<div class="col">
+        		<h3>Добавление запчасти в справочник:</h3>
+      		</div>
+    	</div>
+    	<br>
+    	<form action="{% url 'add_part_url' %}" method="post">
+    		{% csrf_token %}
+    		<div class="form-row">
+    			<div class="col">
+            <label>Наименование:</label>
+    				{{form.name}}
+    			</div>
+    			<div class="col">
+            <label>Партномер производителя:</label>
+    				{{form.part_num}}
+    			</div>
+    		</div>
+    		<div class="form-row">
+    			<div class="col">
+            <label>Описание:</label>
+    				{{form.specification}}
+    			</div>
+    		</div>
+    		<div class="form-row">
+    			<div class="col">
+            <label>Тип запчасти:</label>
+    				{{form.attachment_part}}	
+    			</div>
+    			<div class="col">
+            <label>Принадлежность к технике:</label>
+    				{{form.attachment_appliances}}
+    			</div>
+    			<div class="col">
+            <label>Принадлежность к производителю:</label>
+    				{{form.attachment_manufacturer}}
+    			</div>
+    		</div>
+        <br>
+    		<div class="row justify-content-end">
+        		<div class="col-md-1 col-md-offset-4">
+          			<button tupe="submit" class="btn btn-success" name = "but_1">Добавить</button>
+        		</div>
+      		</div>
+		</form>
+        <br>
+        <hr class="style5">
+        <div class="row">
+            <div class="col">
+                <h3>Добавить тип запчасти в справочник:</h3>
+            </div>
+        </div>
+        <div class="row">
+            <form action="{% url 'add_part_url' %}" method="post">
+                {% csrf_token %}
+                <div class="col">
+                    {{form_add_attachment_part}}
+                    <br>
+                    <button tupe="submit" class="btn btn-success" name = "but_2">Добавить</button>
+                </div>
+                <div class="col">
+                    {{ form_add_attachment_appliances }}
+                    <br>
+                    <button tupe="submit" class="btn btn-success" name = "but_3">Добавить</button>
+                </div>
+                <div class="col">
+                    {{ form_add_manufacturer }}
+                    <br>
+                    <button tupe="submit" class="btn btn-success" name = "but_4">Добавить</button>
+                </div>
+            </form>
+        </div>
+	</div>
+
+
+
+
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'srvbd/base.html' %}
+{% load static %}
+{% block content %}
+
+  <div class="container">
+    <form action="{% url 'create_shipper_url' %}" method="post">
+      {% csrf_token %}
+      <div class="row">
+        <div class="col">
+          <h3>Добавить поставщика:</h3>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="col">
+          <label>Имя:</label>
+          {{ship_create.first_name}}
+        </div>
+        <div class="col">
+          <label>Фамилия:</label>
+          {{ship_create.last_name}}
+        </div>
+        <div class="col">
+          <label>Отчество:</label>
+          {{ship_create.patronymic_name}}
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="col">
+          <label>Описание:</label>
+          {{ship_create.specification}}
+        </div>
+      </div>
+      <br>
+      <div class="row justify-content-end">
+        <div class="col-md-1 col-md-offset-4">
+          <button tupe="submit" class="btn btn-success">Добавить</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'srvbd/base.html' %}
+{% load static %}
+{% block content %}
+  <div class="container">
+    <form action="{% url 'create_persons_url' %}" method="post">
+      {% csrf_token %}
+      <div class="row">
+        <div class="col">
+          <h3>Добавить клиента:</h3>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="col">
+          <label>Имя:</label>
+          {{form.first_name}}
+        </div>
+        <div class="col">
+          <label>Фамилия:</label>
+          {{form.last_name}}
+        </div>
+        <div class="col">
+          <label>Отчество:</label>
+          {{form.patronymic_name}}
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="col-sm">
+          <label>Адресс:</label>
+          {{form.addres}}
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="col">
+          <label>Телефон:</label>
+          {{form.tell}}
+        </div>
+        <div class="col">
+          <label>Email:</label>
+          {{form.email}}
+        </div>
+      </div>
+      <br>
+      <div class="row justify-content-end">
+        <div class="col-md-1 col-md-offset-4">
+          <button tupe="submit" class="btn btn-success">Добавить</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+{% endblock %}

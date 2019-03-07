@@ -1,0 +1,59 @@
+{% extends 'srvbd/base.html' %}
+{% load static %}
+{% block content %}
+	<div class ="container">
+		{% if incom %}
+			<div class="row">
+				<div class="col">
+					<h3>Приход:</h3>
+					<h5>От:<p>{{incom.incoming_date}}</p></h5>
+					<h5>Поставщик:<p>{{incom.ship}}</p></h5>
+					<h5>Курс ($):<p>{{incom.exchange_rates}}</p></h5>
+				</div>
+			</div>
+			<br>
+			<div class="row">
+				<div class="col">
+					<h3>Запчасти в приходе:</h3>
+				</div>
+			</div>
+			<br>
+		{%endif%}
+		<table  class="table table-striped table table-bordered">
+  			<thead class="thead-dark table-condensed table-bordered table-hover">
+    			<tr>
+    				<th scope="col">№ Id</th>
+    				<th scope="col">Наименование</th>
+     				<th scope="col">Партномер производителя</th>
+      				<th scope="col">Описание</th>
+      				<th scope="col">Тип запчасти</th>
+      				<th scope="col">Вид устройства</th>
+      				<th scope="col">Производитель</th>
+              		<th scope="col">Количество</th>
+              		<th scope="col">Стоимость</th>
+              		<th scope="col">Итого</th>
+    			</tr>
+  			</thead>
+  			<tbody>
+
+  				{% if details %}
+    				{% for DetailInIncomList in details %}
+  				
+    			<tr>
+  				  <th scope="row">{{DetailInIncomList.spar_part.id}}</th>
+  				  <td>{{DetailInIncomList.spar_part.name}}</td>
+  				  <td>{{DetailInIncomList.spar_part.part_num}}</td>
+  				  <td>{{DetailInIncomList.spar_part.specification}}</td>
+  				  <td>{{DetailInIncomList.spar_part.attachment_part}}</td>
+  				  <td>{{DetailInIncomList.spar_part.attachment_appliances}}</td>
+  				  <td>{{DetailInIncomList.spar_part.attachment_manufacturer}}</td>
+            	  <td>{{DetailInIncomList.incoming_price}}</td>
+                  <td>{{DetailInIncomList.quantity}}</td>
+            	  <td></td>
+          		</tr>
+    				{%endfor%}
+    			{%endif%}
+    		</tbody>
+    	</table>
+	</div>
+{% endblock %}

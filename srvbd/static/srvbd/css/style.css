@@ -1,0 +1,23 @@
+nav {
+	background-color: #119280;
+}
+
+body {
+	padding-top: 70px;
+	padding-bottom: 20px;
+}
+
+hr.style5 {
+	background-color: #fff;
+	border-top: 2px dashed #8c8b8b;
+}
+
+hr.style12 {
+	height: 6px;
+	background: url(http://ibrahimjabbari.com/english/images/hr-12.png) repeat-x 0 0;
+    border: 0;
+}
+
+div.remoove {
+	display: none;
+}

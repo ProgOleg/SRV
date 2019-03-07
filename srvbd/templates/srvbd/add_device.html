@@ -1,0 +1,55 @@
+{% extends 'srvbd/base.html' %}
+{% load static %}
+{% block content %}
+<script type="text/javascript" src="{% static 'srvbd/js/add_device.js' %}"></script>
+
+	<div class="container" id="main_div" data-ajax-url="{% url 'ajax_add_part_set_list_url' %}">
+		<form id="form_submit" action="{% url 'add_device_url' %}" method="post">
+			<h2>Добавить устройство в справочник:</h2>
+			{% csrf_token %}
+			<br>
+			<h3>Добавить девайс в справочник:</h3>
+			<br>
+			{% if form %}
+				<div class="col-md-4 mt-1">
+					<div class="row">
+						{{form.mod.label}}
+						{{form.mod}}
+					</div>
+					<div class="row mt-1">
+						{{form.pnc.label}}
+						{{form.pnc}}
+					</div>
+					<div class="row mt-1">
+						<label>Вид техники:</label>
+						{{select_form.type_appliances}}
+					</div>
+					<div class="row mt-1">
+						<label>Производитель:</label>
+						{{select_form.manufacturer}}
+					</div>
+						<datalist id="manufacturer"></datalist>
+						<datalist id="type_appliances"></datalist>
+					
+				</div>
+				<div class="col mt-3">
+					<div class="row justify-content-end">
+						<button type="submit" class="btn btn-success">Добавить</button>
+					</div>
+				</div>
+			{% endif %}
+		</form>
+	</div>
+
+
+
+
+
+
+
+
+
+
+
+
+{% endblock %}

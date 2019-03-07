@@ -1,0 +1,77 @@
+{% extends 'srvbd/base.html' %}
+{% load static %}
+{% block content %}
+
+{% if person_create %}
+
+	<script type="text/javascript" src="{% static 'srvbd/js/create_sales_to_customer.js' %}"></script>
+	<form action="{% url 'create_sales_to_customer_url' %}" method="post">
+		{% csrf_token %}
+		<div class="container">
+			<div class="row">
+				<div class="col-md-4">
+					<label>Фамилия:</label>
+					{{person_create.last_name}}
+					{% if person_create.errors.last_name %}
+						<div class="invalid-feedback">{{ person_create.errors.last_name }}</div>
+						<script type="text/javascript"> $('input[name="last_name"]').addClass('is-invalid') </script>
+					{% endif %}
+				</div>
+				<div class="col-md-4">
+					<label>Имя:</label>
+					{{person_create.first_name}}
+					{% if person_create.errors.first_name %}
+						<div class="invalid-feedback">{{ person_create.errors.first_name }}</div>
+						<script type="text/javascript"> $('input[name="first_name"]').addClass('is-invalid') </script>
+					{% endif %}
+				</div>
+				<div class="col-md-4">
+					<label>Отчество:</label>
+					{{person_create.patronymic_name}}
+					{% if person_create.errors.patronymic_name %}
+						<div class="invalid-feedback">{{ person_create.errors.patronymic_name }}</div>
+						<script type="text/javascript"> $('input[name="patronymic_name"]').addClass('is-invalid') </script>
+					{% endif %}
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6">
+					<label>Адрес:</label>
+					{{person_create.addres}}
+					{% if person_create.errors.addres %}
+						<div class="invalid-feedback">{{ person_create.errors.addres }}</div>
+						<script type="text/javascript"> $('input[name="addres"]').addClass('is-invalid') </script>
+					{% endif %}
+				</div>
+				<div class="col-md-6">
+					<label>Email:</label>
+					{{person_create.email}}
+					{% if person_create.errors.email %}
+						<div class="invalid-feedback">{{ person_create.errors.email }}</div>
+						<script type="text/javascript"> $('input[name="email"]').addClass('is-invalid') </script>
+					{% endif %}
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-4">
+					<label>Телефон:</label>
+					{{person_create.tell}}
+					{% if person_create.errors.tell %}
+						<div class="invalid-feedback">{{ person_create.errors.tell }}</div>
+						<script type="text/javascript"> $('input[name="tell"]').addClass('is-invalid') </script>
+					{% endif %}
+				</div>
+				<div class="col-md-2 mt-4 pt-2">
+					<button data-url="{% url 'ajax_check_tell_url' %}" id="check_but" class="btn btn-outline-info " type="button">Чекнуть</button>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col mt-2">
+					<button type="submit" class="btn btn-success float-right">Добавить</button>
+				</div>
+			</div>
+		</div>
+	</form>
+
+{% endif %}
+{% endblock %}

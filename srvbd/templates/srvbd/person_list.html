@@ -1,0 +1,43 @@
+{% extends 'srvbd/base.html' %}
+{% load static %}
+{% block content %}
+	<div class= "container table table-hover">
+		<div class="row">
+			<div class="col">
+				<h3>Список клиентов:</h3>
+			</div>
+		</div>
+		<br>
+		<table class="table table-striped">
+			<thead>
+				<tr class="thead-dark">
+					<th>Имя</th>
+					<th>Фамилия</th>
+					<th>Отчество</th>
+					<th>Номер телефона</th>
+					<th>Адресс</th>
+					<th>Почта</th>
+					<th>Дата добавления</th>
+				</tr>
+			</thead>
+			<tbody>
+			{% if person_last_add %}
+			    {%for Person in person_last_add %}
+				<tr>
+					<td>{{Person.first_name}}</td>
+					<td>{{Person.last_name}}</td>
+					<td>{{Person.patronymic_name}}</td>
+					<td>{{Person.tell}}</td>
+					<td>{{Person.addres}}</td>
+					<td>{{Person.email}}</td>
+					<td>{{Person.pub_date}}</td>
+				{%endfor%}
+				</tr>
+			{%endif%}	
+			</tbody>
+		</table>
+	</div>
+{% endblock %}
+
+
+  
