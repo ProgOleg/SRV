@@ -34,14 +34,14 @@ $('document').ready(function(){
 	$('#but_filter').click(function(event){
 		$('#table_body').empty()
 		$('#filter_table').removeClass('remoove')
-		var select_applience = $('input[name=select_applience').val();
-		var select_type_sparpart = $('input[name=select_type_sparpart').val();
-		var select_manufacturer = $('input[name=select_manufacturer').val();
+		var attachment_appliances = $('input[name=attachment_appliances').val();
+		var attachment_part = $('input[name=attachment_part').val();
+		var attachment_manufacturer = $('input[name=attachment_manufacturer').val();
 		var form = $('#form').attr('action');
 		var data = {};
-		data.select_applience = select_applience;
-		data.select_type_sparpart = select_type_sparpart;
-		data.select_manufacturer = select_manufacturer;
+		data.attachment_appliances = attachment_appliances;
+		data.attachment_part = attachment_part;
+		data.attachment_manufacturer = attachment_manufacturer;
 		$.ajax({
 			url: form,
 			method: "GET",

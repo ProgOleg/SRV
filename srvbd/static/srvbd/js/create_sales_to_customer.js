@@ -3,8 +3,24 @@ $('document').ready(function() {
 	Слушает кнопку чек и делает гет запрос на бек
 	запрос на определение валидности введенного телефона
 	вывоб соответсвенно сообщения об ошибке или ок
-	если чекнутый номер закреплен за клиентом рендерит остальные поля из бд
+	если чекнутый номер закреплен за клиентом рендерит остальные поля из бд посредством confirm
 	*/
+	function exchange_rates(){
+		//Делает запрос на курс USD по селектору exchange_rate-div и дата атрибуту data-ajax-url
+		var url = $('#exchange_rates_div').data('ajax-url')
+		console.log(url)
+		$.get(url, function(data) {
+			if(data['exchange_rates']){
+				$('#id_exchange_rates').val(data['exchange_rates'])
+			}
+			else{
+				$('#id_exchange_rates').val('!!!!!')
+			}
+		});
+	}
+
+
+	exchange_rates()
 
 	$('#check_but').click(function(event) {
 		var url = $(this).data('url');

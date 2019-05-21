@@ -152,29 +152,26 @@ class AddManufacturer(forms.ModelForm):
 class CreateIncom(forms.ModelForm):
     class Meta:
         model = Incoming
-        fields = ['incoming_date','ship','exchange_rates',]
+        fields = ['incoming_date','ship']
         widgets = {
             'incoming_date': forms.DateInput(attrs={'class':"form-control ",'id':"datepicker",
                                                     'placeholder':'Укажите дату прихода',}),
-            'ship': forms.Select(attrs={'class': 'form-control',}),
-            'exchange_rates': forms.NumberInput(attrs={'class': 'form-control','placeholder':'Укажите курс ($)',
-                                                       'step':'0.01','value':'0.00','maxlength':'2',
-                                                       'type':'number','max':'99'}),
+            'ship': forms.Select(attrs={'class': 'form-control'})
         }
 
 
 
 #***__Создание прихода и добавление запчастей на склад__***!!!ЖЕСТКО ЗАКОДИРОВАНЫЕ УРЛЫ В ДАТА АТРИБУТЕ!!!
 class IncomInfoShipper(forms.Form):
-    select_applience = forms.CharField(required=False,
-                                       widget=forms.TextInput(attrs={'list':"select_applience",'class':"form-control",
-                                                                     'data-ajax_url':"/ajax_tools_select_applience/"}))
-    select_type_sparpart = forms.CharField(required=False,
-                                           widget=forms.TextInput(attrs={'list': "select_type_sparpart",'class':"form-control",
-                                                                         'data-ajax_url': "/ajax_tools_select_type_sparpart/"}))
-    select_manufacturer = forms.CharField(required=False,
-                                          widget=forms.TextInput(attrs={'list': "select_manufacturer",'class':"form-control",
-                                                                        'data-ajax_url':"/ajax_tools_select_manufacturer/"}))
+    attachment_appliances = forms.CharField(required=False,
+                                       widget=forms.TextInput(attrs={'list':"attachment_appliances",'class':"form-control",
+                                                                     'data-ajax_url':"/ajax_tools_select_applience/",}))
+    attachment_part = forms.CharField(required=False,
+                                           widget=forms.TextInput(attrs={'list': "attachment_part",'class':"form-control",
+                                                                         'data-ajax_url': "/ajax_tools_select_type_sparpart/",}))
+    attachment_manufacturer = forms.CharField(required=False,
+                                          widget=forms.TextInput(attrs={'list': "attachment_manufacturer",'class':"form-control",
+                                                                        'data-ajax_url':"/ajax_tools_select_manufacturer/",}))
 
 
 
@@ -198,17 +195,22 @@ class SelectManufacturTypeAppliances(forms.Form):
 
 class FilterDetail(forms.Form):
 
-    name = forms.CharField(widget=forms.TextInput(attrs={'class': "form-control",'id':"name",
-                                                         'maxlength': "50"}))
-    specification = forms.CharField(widget=forms.TextInput(attrs={'class': "form-control", 'id': "specification",
-                                                                  'maxlength':"50"}))
-    part_num = forms.CharField(widget=forms.TextInput(attrs={'class': "form-control", 'id': "part_num",
-                                                                  'maxlength':"50"}))
+    name = forms.CharField(required=False,widget=forms.TextInput(attrs={'class': "form-control",'id':"name",
+                                                         'maxlength': "50",}))
+    specification = forms.CharField(required=False,widget=forms.TextInput(attrs={'class': "form-control", 'id': "specification",
+                                                                  'maxlength':"50",}))
+    part_num = forms.CharField(required=False,widget=forms.TextInput(attrs={'class': "form-control", 'id': "part_num",
+                                                                  'maxlength':"50",}))
 
 
 
+class ExchangeRatesForm(forms.ModelForm):
 
-
+    class Meta:
+        model = ExchangeRates
+        fields = ['exchange_rates']
+        widgets = {'exchange_rates': forms.NumberInput(attrs={'class':'form-control','placeholder':"Укажите курс 'USD'",
+                                                       'step':'0.01','value':'0.00'})}
 
 
 

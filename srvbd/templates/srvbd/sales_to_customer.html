@@ -3,70 +3,73 @@
 {% block content %}
 	
 	<script type="text/javascript" src="{% static 'srvbd/js/sales_to_customer.js' %}"></script>
-	<form>
-		<div class="container">
-			<div class="row">
-				<h3>Продажа запчастей клиенту</h3>
-			</div>
-			<hr>
-			<div class="row">
-				<h4>Клиент:</h2>
-			</div>
-			<dl class="row">
-				<dt class="col-sm-3">Фамилия:</dt>
-				<dd class="col-sm-9">{{person.last_name}}</dd>
-				<dt class="col-sm-3">Имя:</dt>
-				<dd class="col-sm-9">{{person.first_name}}</dd>
-				<dt class="col-sm-3">Отчесвто:</dt>
-				<dd class="col-sm-9">{{person.patronymic_name}}</dd>
-				<dt class="col-sm-3">Телефон:</dt>
-				<dd class="col-sm-9">{{person.tell}}</dd>
-			</dl>
-			<hr>
-			<div class="row">
-				<h4>Выберите запчасть</h4>
-			</div>
-			<div class="row justify-content-between">
-				<div class="col-md-6">
-    				<label for="name">Наименование:</label>
-    				{{detail_filter.name}}
-    			</div>
-    			<div class="col-md-4">
-					<label for="select_applience">Выберите тип устройства:</label>
-    				{{specification_filter.select_applience}}
-    				<datalist id="select_applience"></datalist>
-    			</div>
-			</div>
-			<div class="row justify-content-between">
-				<div class="col-md-6">
-					<label for="specification">Описаине:</label>
-    				{{detail_filter.specification}}
-    			</div>
-    			<div class="col-md-4">
-    				<label for="select_type_sparpart">Выберите тип запчасти:</label>
-    				{{specification_filter.select_type_sparpart}}
-    				<datalist id="select_type_sparpart"></datalist>
-    			</div>
-			</div>
-			<div class="row justify-content-between">
-				<div class="col-md-6">
-					<label for="part_num">Парт-номер произвоидетеля:</label>
-    				{{detail_filter.part_num}}
-    			</div>
-    			<div class="col-md-4">
-    				<label for="select_manufacturer">Выберите производителя:</label>
-    				{{specification_filter.select_manufacturer}}
-    				<datalist id="select_manufacturer"></datalist>
-    			</div>
-			</div>
-			<div class="row justify-content-end">
-				<div class="col-md-1 col-md-offset-4 mt-4">
-		    		<button id="but_filter" class="btn btn-success" >Фильтр</button>
-		    	</div>
-		    </div>
+		<div class="container" data-index-url="{% url 'sales_to_customer_url' invoice_id %}">
+			<form id="filter_form" action="{% url 'ajax_sales_to_customer_filter' %}">
+				<div class="row">
+					<h3>Продажа запчастей клиенту</h3>
+				</div>
+				<hr>
+				<div class="row">
+					<h4>Клиент:</h2>
+				</div>
+				<dl class="row">
+					<dt class="col-sm-3">Фамилия:</dt>
+					<dd class="col-sm-9">{{person.last_name}}</dd>
+					<dt class="col-sm-3">Имя:</dt>
+					<dd class="col-sm-9">{{person.first_name}}</dd>
+					<dt class="col-sm-3">Отчесвто:</dt>
+					<dd class="col-sm-9">{{person.patronymic_name}}</dd>
+					<dt class="col-sm-3">Телефон:</dt>
+					<dd class="col-sm-9">{{person.tell}}</dd>
+				</dl>
+				<hr>
+				<div class="row">
+					<h4>Выберите запчасть</h4>
+				</div>
+				<div class="row justify-content-between">
+					<div class="col-md-6">
+	    				<label for="name">Наименование:</label>
+	    				{{detail_filter.name}}
+	    			</div>
+	    			<div class="col-md-4">
+						<label for="select_applience">Выберите тип устройства:</label>
+	    				{{specification_filter.attachment_appliances}}
+	    				<datalist id="select_applience"></datalist>
+	    			</div>
+				</div>
+				<div class="row justify-content-between">
+					<div class="col-md-6">
+						<label for="specification">Описаине:</label>
+	    				{{detail_filter.specification}}
+	    			</div>
+	    			<div class="col-md-4">
+	    				<label for="select_type_sparpart">Выберите тип запчасти:</label>
+	    				{{specification_filter.attachment_part}}
+	    				<datalist id="select_type_sparpart"></datalist>
+	    			</div>
+				</div>
+				<div class="row justify-content-between">
+					<div class="col-md-6">
+						<label for="part_num">Парт-номер произвоидетеля:</label>
+	    				{{detail_filter.part_num}}
+	    			</div>
+	    			<div class="col-md-4">
+	    				<label for="select_manufacturer">Выберите производителя:</label>
+	    				{{specification_filter.attachment_manufacturer}}
+	    				<datalist id="select_manufacturer"></datalist>
+	    			</div>
+				</div>
+				
+				<div class="row justify-content-end">
+					<div class="col-md-1 col-md-offset-4 mt-4">
+			    		<button id="but_filter" class="btn btn-success" type="submit" >Фильтр</button>
+			    	</div>
+			    </div>
+		    </form>
+			
 		    <br>
-		    <div class="row justify-content-center remoove">
-				<table  class="table table-striped table-bordered " id="filter_table" >
+		    <div class="row justify-content-center remoove" id ="filter_table">
+				<table  class="table table-striped table-bordered " >
 		  			<thead class="thead-dark table-condensed table-bordered table-hover">
 		    			<tr>
 		    				<th scope="col">№ Id</th>
@@ -82,33 +85,42 @@
 		              		<th scope="col">Дейсвие</th>
 		    			</tr>
 		  			</thead>
-		  			<tbody id="filter_table_body">
+		  			<tbody id="filter_table_body" data-ajax_url="{% url 'ajax_tools_sales_to_customer_add_detail' invoice_id %}">
 
 		    		</tbody>
 		    	</table>
 	    	</div>
-	    	<div class="row justify-content-center remoove">
-	    	<br>
-			<table class="table table-striped table table-bordered" >
-	  			<thead class="thead-dark table-condensed table-bordered table-hover">
-	    			<tr>
-	      				<th scope="col">Наименование</th>
-	     		 		<th scope="col">Партномер производителя</th>
-	      				<th scope="col">Описание</th>
-	      				<th scope="col">Количество</th>
-	      				<th scope="col">Цена</th>
-	      				<th scope="col">Действие</th>
-	    			</tr>
-	  			</thead>
-		  			<tbody id="tbody_new_detail" data-form-action="">
-			    		
-					</tbody>
-	    	</table>
+	    	<div class="remoove" id="new_detail_table" data-ajax-change-quant-price-url="{% url 'ajax_sales_to_customer_change_quant_price' %}">
+	    		<div class="row">
+	    			<h4>Запчасти на клиента:</h4>
+	    		</div>
+	    		<hr>
+		    	<br>
+		    	<div class="row justify-content-center">
+					<table class="table table-striped table table-bordered" >
+			  			<thead class="thead-dark table-condensed table-bordered table-hover">
+			    			<tr>
+			      				<th scope="col">Наименование</th>
+			     		 		<th scope="col">Партномер производителя</th>
+			      				<th scope="col">Описание</th>
+			      				<th scope="col">Количество</th>
+			      				<th scope="col">Цена прихода</th>
+			      				<th scope="col">Цена продажи</th>
+			      				<th scope="col">Действие</th>
+			    			</tr>
+			  			</thead>
+				  			<tbody id="tbody_new_detail" data-form-action="{% url 'ajax_sales_to_customer_delete_detail' %}">
+					    		
+							</tbody>
+			    	</table>
+		    	</div>
+	    	</div>
+	    	<div class="row justify-content-end">
+	    		<button id="save" tupe="button" class="btn btn-success btn-lg">Сохранить</button>
 	    	</div>
 		</div>
-	</form>
-
-
+	
+		
 
 
 

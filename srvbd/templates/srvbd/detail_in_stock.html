@@ -11,7 +11,7 @@
 		<table  class="table table-striped table table-bordered" >
   			<thead class="thead-dark table-condensed table-bordered table-hover">
     			<tr>
-    				<th scope="col">№ Id</th>
+    				<th scope="col">№ ID</th>
     				<th scope="col">Наименование</th>
      				<th scope="col">Партномер производителя</th>
       				<th scope="col">Описание</th>
@@ -19,8 +19,8 @@
       				<th scope="col">Вид устройства</th>
       				<th scope="col">Производитель</th>
               		<th scope="col">Приход</th>
-              		<th scope="col">Количество</th>
               		<th scope="col">Стоимость</th>
+              		<th scope="col">Кол-во</th>
               		<th scope="col">Итого</th>
     			</tr>
   			</thead>
@@ -29,14 +29,14 @@
   				{% if detail %}
     				{% for Detail in detail %}
     			<tr>
-  				  <th scope="row">{{Detail.detail_name.id}}</th>
-  				  <td>{{Detail.detail_name.name}}</td>
-  				  <td>{{Detail.detail_name.part_num}}</td>
-  				  <td>{{Detail.detail_name.specification}}</td>
-  				  <td>{{Detail.detail_name.attachment_part}}</td>
-  				  <td>{{Detail.detail_name.attachment_appliances}}</td>
-  				  <td>{{Detail.detail_name.attachment_manufacturer}}</td>
-                  <td>{{Detail.attash_for_incoming.incoming_date}}</td>
+  				  <th scope="row">{{i.detail_name__id}}</th>
+  				  <td>{{Detail.detail_name__name}}</td>
+  				  <td>{{Detail.detail_name__part_num}}</td>
+  				  <td>{{Detail.detail_name__specification}}</td>
+  				  <td>{{Detail.detail_name__attachment_part__type_spar_part}}</td>
+  				  <td>{{Detail.detail_name__attachment_appliances__type_appliances}}</td>
+  				  <td>{{Detail.detail_name__attachment_manufacturer__manufacturer}}</td>
+                  <td>{{Detail.attach_for_incoming__incoming_date}}</td>
             	  <td>{{Detail.incoming_price}}</td>
                   <td>{{Detail.quantity}}</td>
             	  <td></td>

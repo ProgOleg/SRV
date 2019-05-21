@@ -21,3 +21,7 @@ hr.style12 {
 div.remoove {
 	display: none;
 }
+
+.table-striped tbody tr.error {
+	background: #FF6440;
+}

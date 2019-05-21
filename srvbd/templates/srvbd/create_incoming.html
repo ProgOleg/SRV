@@ -2,6 +2,7 @@
 {% load static %}
 {% block content %}
 	
+	<script type="text/javascript" src="{% static 'srvbd/js/create_incoming.js' %}"></script>
 	{% if incming_stat_false %}
 		<form action="{% url 'create_incoming_url' %}" method="post">
 			{% csrf_token %}
@@ -66,9 +67,9 @@
 						<label>Выберите поставщика:</label>
 						{{create_incom.ship}}
 					</div>	
-					<div class="col">
-						<label>Укажите курс (%):</label>
-						{{create_incom.exchange_rates}}
+					<div class="col" id="exchange_rates" data-ajax-url="{% url 'get_usd_exchange_rates' %}">
+						<label>Укажите курс 'USD':</label>
+						{{exchange_rates.exchange_rates}}
 					</div>
 				</div>
 				<br>
