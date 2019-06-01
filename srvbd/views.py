@@ -15,10 +15,13 @@ from datetime import *
 from time import sleep
 import requests
 import json
+import telepot
+
 #from . import utils
 from srvbd.utils import *
 
 def index(request):
+
     return render(request, 'srvbd/index.html')
 
 
@@ -644,6 +647,51 @@ def tools_ajax_exchange_rates_usd_privat24(request):
         else: return HttpResponse(status=200)
     else: return HttpResponse(status=403)
 
+
+
+def telegram_bot(request):
+    token = '582672380:AAHxkZmTD6HvoOaOCoAZY7kq66Mz3Xw3qVI'
+    url = 'https://api.telegram.org/bot{}/'.format(token)
+
+    # команды
+    command_get = 'getMe'
+    command_updates = 'getUpdates'
+    command_sendmes = 'sendMessage'
+    command_set_webhook = 'setWebhook?url=https://127.0.0.1/telegram_hook/'
+
+    def send_message(chat_id,data):
+        url_r = url+command_sendmes
+        message = {'chat_id':chat_id,'text':data}
+        r = requests.post(url_r,message)
+        print(r.json())
+
+
+    def send_update():
+        request_url = url + command_updates
+        r = requests.get(request_url)
+        print(r.text)
+        resp = r.json()
+        chat_id = resp['result'][-1]['message']['chat']['id']
+        message = resp['result'][-1]['message']['text']
+        return {'chat_id':chat_id,'message':message}
+
+    if request.method == 'POST':
+        ansver = request.POST['ansver']
+
+        a = send_update()
+
+        context = a['message']
+        chat_id = a['chat_id']
+        send_message(chat_id,ansver)
+
+    return render(request, 'srvbd/index.html',{'context':context})
+
+
+def telegram_hook(request):
+    if request.method == 'POST':
+        print(request.POST)
+        import pdb;
+        pdb.set_trace()
 
 
 

@@ -44,7 +44,8 @@ urlpatterns = [
     path('ajax_tools_sales_to_customer_change_quant_price',views.sales_to_customer_change_quant_price,name='ajax_sales_to_customer_change_quant_price'),
     #TEST
     path('ajax_tools_exchange_rates_usd_privat24/',views.tools_ajax_exchange_rates_usd_privat24,name="get_usd_exchange_rates"),
-
+    path('telegram_bot/',views.telegram_bot,name='telegram_bot_url'),
+    path('telegram_hook/',views.telegram_hook,name='telegram_hook_url'),
 
 ]
 
