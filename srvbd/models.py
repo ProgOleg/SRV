@@ -1,7 +1,8 @@
 from django.db import models
 from django.utils import timezone
-
-
+from django.db.models.functions import Concat
+from django.db.models import Value as V
+from django.db.models import Sum
 #***_Клиенты_***
 
 class Person(models.Model):
@@ -16,6 +17,11 @@ class Person(models.Model):
     def __str__(self):
         return "{} {}.{}, {}".format(self.last_name, self.first_name[0],self.patronymic_name[0],self.tell)
 
+    @property
+    def fulll_name(self):
+        "Returns the person's full name."
+        return '%s %s' % (self.first_name, self.last_name)
+
 
 #***_Запчасти справочник_***
 
@@ -24,11 +30,11 @@ class SparPart(models.Model):
     part_num = models.CharField("Парт номер", max_length=30, unique=True, blank=True,null=True)
     specification = models.TextField("Описание",max_length=2000,blank=True,null=True)
 
-    attachment_part = models.ForeignKey('TypeSparPart',on_delete=models.CASCADE,
-                                    related_name='attachment_for_part')
-    attachment_appliances = models.ForeignKey('TypeAppliances',on_delete=models.CASCADE,
-                                            related_name='attachment_for_appliances')
-    attachment_manufacturer = models.ForeignKey('Manufacturer',on_delete=models.CASCADE,
+    attachment_part = models.ForeignKey('TypeSparPart',on_delete=models.SET_NULL,
+                                    related_name='attachment_for_part',null=True)
+    attachment_appliances = models.ForeignKey('TypeAppliances',on_delete=models.SET_NULL,
+                                            related_name='attachment_for_appliances',null=True)
+    attachment_manufacturer = models.ForeignKey('Manufacturer',on_delete=models.SET_NULL,
                                             related_name='attachment_for_manufacturer',blank=True,null=True)
 
     def __str__(self):
@@ -73,7 +79,9 @@ class Incoming(models.Model):
     incoming_date = models.DateField()
     ship = models.ForeignKey('Shipper',null=True,on_delete=models.SET_NULL,
                              related_name='attash_incoming_list')
-    exchange_rates = models.DecimalField(max_digits=4,decimal_places=2)
+    exchange_rates = models.ForeignKey('ExchangeRates', on_delete=models.SET_NULL, null=True, default=None,
+                                        related_name='incoming_exchange_rates')
+
     status = models.BooleanField(default=False)
 
 
@@ -97,8 +105,8 @@ class Shipper(models.Model):
 #***__Промежуточная таблица(используется только при добавлении в приход,и хранится как зч в приходе***
 
 class DetailInIncomList(models.Model):
-    spar_part = models.ForeignKey('SparPart', on_delete=None, related_name='detail_detail_in_list',null=True)
-    selector_incom = models.ForeignKey('Incoming', on_delete=None, related_name='select_incom',null=True)
+    spar_part = models.ForeignKey('SparPart', on_delete=models.SET_NULL, related_name='detail_detail_in_list',null=True)
+    selector_incom = models.ForeignKey('Incoming', on_delete=models.SET_NULL, related_name='select_incom',null=True)
     incoming_price = models.DecimalField(max_digits=6, decimal_places=2,default=0)
     quantity = models.DecimalField(max_digits=6, decimal_places=2,default=0)
 
@@ -110,11 +118,11 @@ class DetailInIncomList(models.Model):
 #***__Модель_запчастей_на складе__***
 
 class Detail(models.Model):
-    detail_name = models.ForeignKey('SparPart', on_delete=None, related_name='detail_in_detail')
-    incoming_price = models.DecimalField(max_digits=6, decimal_places=2)
-    quantity = models.DecimalField(max_digits=6, decimal_places=2)
-    attash_for_incoming = models.ForeignKey('Incoming',on_delete=None,related_name='attash_incom')
-
+    detail_name = models.ForeignKey('SparPart', on_delete=models.SET_NULL, related_name='detail_in_detail',null=True)
+    incoming_price = models.DecimalField(max_digits=6, decimal_places=2,default=0,null=True)
+    quantity = models.DecimalField(max_digits=6, decimal_places=2,default=0,null=True)
+    attach_for_incoming = models.ForeignKey('Incoming',on_delete=models.SET_NULL,related_name='attash_incom',null=True)
+    status_delete = models.BooleanField(default=False)
 
     def __str__(self):
         return "{} {}".format(self.detail_name, self.incoming_price)
@@ -135,20 +143,20 @@ class DeviceUnderRepair(models.Model):
     status_ready = models.BooleanField(default=False)
     status_delivery = models.BooleanField(default=False)
 
-    device_attach = models.ForeignKey("Device",on_delete=None,related_name='device_in_repair')
-    person_attach = models.ForeignKey("Person",on_delete=None,related_name='device_person')
-    comment = models.ForeignKey("Comment", on_delete=None, related_name='device_comment',blank=True)
+    device_attach = models.ForeignKey("Device",on_delete=models.SET_NULL,related_name='device_in_repair',null=True)
+    person_attach = models.ForeignKey("Person",on_delete=models.SET_NULL,related_name='device_person',null=True)
+    comment = models.ForeignKey("Comment", on_delete=models.SET_NULL, related_name='device_comment',blank=True,null=True)
 
 
     def __str__(self):
-        return "{}".format(self.device_atach)
+        return "{}".format(self.device_attach)
 
 
 #***__Изделия(техника)__***
 
 class Device(models.Model):
-    manufacturer = models.ForeignKey('Manufacturer',on_delete=None,related_name='device_manufacturer',null=True)
-    type_appliances = models.ForeignKey('TypeAppliances',on_delete=None,related_name='device_type_appliances',null=True)
+    manufacturer = models.ForeignKey('Manufacturer',on_delete=models.SET_NULL,related_name='device_manufacturer',null=True)
+    type_appliances = models.ForeignKey('TypeAppliances',on_delete=models.SET_NULL,related_name='device_type_appliances',null=True)
 
     mod = models.CharField("Модель:",max_length=50,unique=True)
     serial_number = models.CharField("Серийный номер:",max_length=50,blank=True,default=None,null=True)
@@ -172,12 +180,12 @@ class Comment(models.Model):
 #***__Виртуальная запчасть(не существует на складе).Объект расходного ордера!__***
 
 class VirtualSaleObject(models.Model):
-    spar_part_attach = models.ForeignKey("SparPart",on_delete=None,related_name='virtual_sale')
+    spar_part_attach = models.ForeignKey("SparPart",on_delete=models.SET_NULL,related_name='virtual_sale',null=True)
 
-    repair_invoice_attach = models.ForeignKey("RepairInvoice", on_delete=None, related_name='virtual_repair_invoice',
-                                              blank=False, default=None)
-    person_invoice_attach = models.ForeignKey("SalesPersonInvoice", on_delete=None, related_name='virtual_person_invoice',
-                                              blank=False, default=None)
+    repair_invoice_attach = models.ForeignKey("RepairInvoice", on_delete=models.SET_NULL, related_name='virtual_repair_invoice',
+                                              default=None,null=True)
+    person_invoice_attach = models.ForeignKey("SalesPersonInvoice", on_delete=models.SET_NULL, related_name='virtual_person_invoice',
+                                              default=None,null=True)
 
     quantity = models.DecimalField(max_digits=6, decimal_places=2)
     sale_price = models.DecimalField(max_digits=6, decimal_places=2, default=0)
@@ -190,15 +198,15 @@ class VirtualSaleObject(models.Model):
 #***__Материально существующая  запчасть на складе).Объект расходного ордера!__***
 
 class MaterialSaleObject(models.Model):
-    detail_attach = models.ForeignKey("Detail", on_delete=None, related_name='material_sale')
+    detail_attach = models.ForeignKey("Detail", on_delete=models.SET_NULL, related_name='material_sale',null=True)
 
-    repair_invoice_attach = models.ForeignKey("RepairInvoice", on_delete=None, related_name='material_repair_invoice',
-                                              blank=False,default=None)
-    person_invoice_attach = models.ForeignKey("SalesPersonInvoice", on_delete=None, related_name='material_person_invoice',
-                                              blank=False,default=None)
+    repair_invoice_attach = models.ForeignKey("RepairInvoice", on_delete=models.SET_NULL, related_name='material_repair_invoice',
+                                              default=None,null=True)
+    person_invoice_attach = models.ForeignKey("SalesPersonInvoice", on_delete=models.SET_NULL, related_name='material_person_invoice',
+                                              default=None,null=True)
 
-    quantity = models.DecimalField(max_digits=6, decimal_places=2)
-    sale_price = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+    quantity = models.DecimalField(max_digits=6, decimal_places=2,default=0,null=True)
+    sale_price = models.DecimalField(max_digits=6, decimal_places=2, default=0,null=True)
 
 
     def __str__(self):
@@ -208,11 +216,15 @@ class MaterialSaleObject(models.Model):
 #***__Расходный ордер продажи запчастей клиенту__***
 
 class SalesPersonInvoice(models.Model):
-    person_attach = models.ForeignKey("Person", on_delete=None, related_name='detail_sale')
+    person_attach = models.ForeignKey("Person", on_delete=models.SET_NULL, related_name='detail_sale',null=True)
+    exchange_rates = models.ForeignKey('ExchangeRates', on_delete=models.SET_NULL, null=True, default=None,
+                                       related_name='sale_person_exchange_rates')
 
-    invoice_sum = models.DecimalField(max_digits=6, decimal_places=2,null=True)
+    invoice_sum = models.DecimalField(max_digits=15, decimal_places=2,null=True)
     date_create = models.DateTimeField(auto_now_add=True)
-    stays = models.BooleanField(default=False)
+    status = models.BooleanField(default=False)
+    payment_state = models.BooleanField(default=False)
+    date_of_payment = models.DateTimeField(default=None,null=True)
 
     def __str__(self):
         return "{} {} {}".format(self.date_create,self.person_attach,self.invoice_sum)
@@ -221,19 +233,27 @@ class SalesPersonInvoice(models.Model):
 #***__Расходная накладная запчастей использованых в ремонте__***
 
 class RepairInvoice(models.Model):
-    repair_attach = models.ForeignKey("DeviceUnderRepair", on_delete=None, related_name='detail_invoice')
+    repair_attach = models.ForeignKey("DeviceUnderRepair", on_delete=models.SET_NULL, related_name='detail_invoice',null=True)
+    exchange_rates = models.ForeignKey('ExchangeRates', on_delete=models.SET_NULL, null=True, default=None,
+                                        related_name='repair_exchange_rates')
 
     invoice_sum = models.DecimalField(max_digits=6, decimal_places=2)
     date_create = models.DateTimeField(auto_now_add=True)
-    stays = models.BooleanField(default=False)
+    status = models.BooleanField(default=False)
 
 
     def __str__(self):
         return "{} {} {}".format(self.repair_attach,self.date_create,self.invoice_sum)
 
 
+class ExchangeRates(models.Model):
 
+    data_create = models.DateField(auto_now_add=True)
+    exchange_rates = models.DecimalField(max_digits=6,decimal_places=2,default=0,null=True)
+    status_own_change = models.BooleanField(default=False)
 
+    def __str__(self):
+        return "{}, {}".format(self.exchange_rates,self.data_create)
 
 
 

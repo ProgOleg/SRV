@@ -32,14 +32,25 @@ urlpatterns = [
     #Продажа клиенту
     path('sales_to_customer/',views.CreateSalesToCustomer.as_view(),name="create_sales_to_customer_url"),
     path('ajax_check_tell/',views.tools_ajax_check_tell,name='ajax_check_tell_url'),
-    #
     path('sales_to_customer/<int:invoice_id>/',views.SalesToCustomer.as_view(),name='sales_to_customer_url'),
-    #TEST
-    path('test/',views.get_exchange_rates_privat24,name="test_url"),
     # Выборка по "Тип устройства(select_applience)" для рендеринка <datalist> !!!ЖЕСТКО ОДИРОВАНЫЕ УРЛЫ В ФОРМЕ!!!
     path('ajax_tools_select_applience/',views.data_list_select_appliances,name="option_select_applience"),
     path('ajax_tools_select_type_sparpart/',views.data_list_select_type_sparpart,name="option_select_type_sparpart"),
     path('ajax_tools_select_manufacturer/',views.data_list_select_manufacturer,name="option_select_manufacturer"),
+    #
+    path('ajax_tools_sales_to_customer_filter/',views.sales_to_customer_filter,name='ajax_sales_to_customer_filter'),
+    path('ajax_tools_sales_to_customer_add_detail/<int:invoice_id>/',views.sales_to_customer_add_detail,name='ajax_tools_sales_to_customer_add_detail'),
+    path('ajax_tools_sales_to_customer_delete_detail',views.sales_to_customer_delete_detail,name='ajax_sales_to_customer_delete_detail'),
+    path('ajax_tools_sales_to_customer_change_quant_price',views.sales_to_customer_change_quant_price,name='ajax_sales_to_customer_change_quant_price'),
+    #Список продажных ордеров
+    path('sales_to_customer_list',views.Sales_to_customer_list.as_view(),name='sales_to_customer_list_url'),
+    #Продажный ордер
+    path('sales_invoice/<int:sales_invoice>',views.Sales_invoice.as_view(),name='sales_invoice_url'),
+    #TEST
+    path('ajax_tools_exchange_rates_usd_privat24/',views.tools_ajax_exchange_rates_usd_privat24,name="get_usd_exchange_rates"),
+    path('telegram_bot/',views.telegram_bot,name='telegram_bot_url'),
+    path('telegram_hook/',views.telegram_hook,name='telegram_hook_url'),
+
 ]
 
 

@@ -80,7 +80,7 @@
 					{% csrf_token %}
 					<div class="col">
 						<label>Выберите тип устройства:</label>
-						{{ filter_spar_part.select_applience }}
+						{{ filter_spar_part.attachment_appliances }}
 			   			<datalist id="applience">
 			   			{% for field in choice_appliances %}
 			    			<option value="{{ field.type_appliances}}"></option>
@@ -89,7 +89,7 @@
 			    	</div>
 			    	<div class="col">
 			    		<label>Выберите тип запчасти:</label>
-			    		{{ filter_spar_part.select_type_sparpart }}
+			    		{{ filter_spar_part.attachment_part }}
 			    		<datalist id="type_sparpart">
 			   			{% for field in choice_type_sparpart %}
 			    			<option value="{{ field.type_spar_part}}"></option>
@@ -98,7 +98,7 @@
 			    	</div>
 			    	<div class="col">
 			    		<label>Выберите производителя:</label>
-			    		{{ filter_spar_part.select_manufacturer }}
+			    		{{ filter_spar_part.attachment_manufacturer }}
 			    		<datalist id="manufactuer">
 			   			{% for field in choice_manufactuer %}
 			    			<option value="{{ field.manufacturer}}"></option>

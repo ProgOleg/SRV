@@ -2,4 +2,20 @@
 {% load static %}
 {% block content %}
 
+	<form action="{% url 'telegram_bot_url' %}" method="post">
+		{% csrf_token %}
+		<div class="container">
+			<div class="row">
+				<div class="col-md-3">
+					<h1>Ответ:</h1>
+					{{context}}
+				</div>
+				<div class="col-md-3">
+					<input type="text" name="ansver">
+				</div>
+			</div>
+			<button class="btn btn-success" type="submit">Ебануть боту</button>
+		</div>
+	</form>
+
 {% endblock %}

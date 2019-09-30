@@ -43,12 +43,20 @@
 						<script type="text/javascript"> $('input[name="addres"]').addClass('is-invalid') </script>
 					{% endif %}
 				</div>
-				<div class="col-md-6">
+				<div class="col-md-4">
 					<label>Email:</label>
 					{{person_create.email}}
 					{% if person_create.errors.email %}
 						<div class="invalid-feedback">{{ person_create.errors.email }}</div>
 						<script type="text/javascript"> $('input[name="email"]').addClass('is-invalid') </script>
+					{% endif %}
+				</div>
+				<div class="col-md-2" id="exchange_rates_div" data-ajax-url="{% url 'get_usd_exchange_rates' %}">
+					<label>Курс(USD):</label>
+					{{exchange_rates.exchange_rates}}
+					{% if exchange_rates.errors.exchange_rates %}
+						<div class="invalid-feedback">{{ exchange_rates.errors.exchange_rates }}</div>
+						<script type="text/javascript"> $('input[name="exchange_rates"]').addClass('is-invalid') </script>
 					{% endif %}
 				</div>
 			</div>

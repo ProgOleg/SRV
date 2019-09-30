@@ -42,8 +42,8 @@
 					{% csrf_token %}
 					<div class="col">
 						<label>Выберите тип устройства:</label>
-						{{ filter_spar_part.select_applience }}
-			   			<datalist  id="applience">
+						{{ filter_spar_part.attachment_appliances }}
+			   			<datalist  id="attachment_appliances">
 			   			{% for field in choice_appliances %}
 			    			<option value="{{ field.type_appliances}}"></option>
 			    		{% endfor %}
@@ -51,8 +51,8 @@
 			    	</div>
 			    	<div class="col">
 			    		<label>Выберите тип запчасти:</label>
-			    		{{ filter_spar_part.select_type_sparpart }}
-			    		<datalist id="type_sparpart">
+			    		{{ filter_spar_part.attachment_part }}
+			    		<datalist id="attachment_part">
 			   			{% for field in choice_type_sparpart %}
 			    			<option value="{{ field.type_spar_part}}"></option>
 			    		{% endfor %}
@@ -60,8 +60,8 @@
 			    	</div>
 			    	<div class="col">
 			    		<label>Выберите производителя:</label>
-			    		{{ filter_spar_part.select_manufacturer }}
-			    		<datalist id="manufactuer">
+			    		{{ filter_spar_part.attachment_manufacturer }}
+			    		<datalist id="attachment_manufacturer">
 			   			{% for field in choice_manufactuer %}
 			    			<option value="{{ field.manufacturer}}"></option>
 			    		{% endfor %}

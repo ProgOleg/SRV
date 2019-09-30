@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    #'Bootstrap4',
+    'requests',
+    "sslserver",
 
 ]
 
@@ -127,3 +128,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+LOGGING = {'version': 1,
+           'disable_existing_loggers': False,
+           'handlers': {'console':
+                            {'level': 'DEBUG', 'class': 'logging.StreamHandler', }, },
+           'loggers': {'django.db.backends':
+                           {'handlers': ['console'], 'level': 'DEBUG', }, }
+           }
