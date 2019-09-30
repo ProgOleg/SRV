@@ -23,14 +23,14 @@
   			<tbody>
 
   				{% if all_incoming %}
-    				{% for Incom in all_incoming %}
+    				{% for incom in all_incoming %}
     			<tr>
-  				  <th scope="row">{{Incom.id}}</th>
-  				  <td><a href="/incoming_list/get_{{Incom.id}}/">{{Incom.incoming_date}}</a></td>
-  				  <td>{{Incom.ship}}</td>
-  				  <td>{{Incom.exchange_rates}}</td>
+  				  <th scope="row">{{incom.id}}</th>
+  				  <td><a href="/incoming_list/get_{{incom.id}}/">{{incom.incoming_date}}</a></td>
+  				  <td>{{incom.ship}}</td>
+  				  <td>{{incom.exchange_rates}}</td>
   				  <td></td>
-  				  <td>{{Incom.status}}</td>
+  				  <td>{{incom.status}}</td>
           		</tr>
     				{%endfor%}
     			{%endif%}

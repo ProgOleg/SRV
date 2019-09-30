@@ -1,7 +1,8 @@
 from django.db import models
 from django.utils import timezone
-
-
+from django.db.models.functions import Concat
+from django.db.models import Value as V
+from django.db.models import Sum
 #***_Клиенты_***
 
 class Person(models.Model):
@@ -15,6 +16,11 @@ class Person(models.Model):
 
     def __str__(self):
         return "{} {}.{}, {}".format(self.last_name, self.first_name[0],self.patronymic_name[0],self.tell)
+
+    @property
+    def fulll_name(self):
+        "Returns the person's full name."
+        return '%s %s' % (self.first_name, self.last_name)
 
 
 #***_Запчасти справочник_***
@@ -214,9 +220,11 @@ class SalesPersonInvoice(models.Model):
     exchange_rates = models.ForeignKey('ExchangeRates', on_delete=models.SET_NULL, null=True, default=None,
                                        related_name='sale_person_exchange_rates')
 
-    invoice_sum = models.DecimalField(max_digits=6, decimal_places=2,null=True)
+    invoice_sum = models.DecimalField(max_digits=15, decimal_places=2,null=True)
     date_create = models.DateTimeField(auto_now_add=True)
     status = models.BooleanField(default=False)
+    payment_state = models.BooleanField(default=False)
+    date_of_payment = models.DateTimeField(default=None,null=True)
 
     def __str__(self):
         return "{} {} {}".format(self.date_create,self.person_attach,self.invoice_sum)

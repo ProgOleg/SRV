@@ -134,8 +134,9 @@ jQuery(document).ready(function($) {
 	})	
 
 	$('#save').click(function(event) {
+		var payment_status = $('#payment').prop("checked")
 		var url = $('div.container').data('index-url')
-		$.post(url,function(data,statusText) {
+		$.post(url,{'payment_status': payment_status},function(data,statusText) {
 			if (statusText === 'success' && data){
 				if ('quant_val_error' in data){
 					$(`#${data['quant_val_error']}`).addClass('error')
@@ -148,6 +149,8 @@ jQuery(document).ready(function($) {
 		});
 	});
 
+	
+	
 
 
 });

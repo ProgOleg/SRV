@@ -116,8 +116,16 @@
 		    	</div>
 	    	</div>
 	    	<div class="row justify-content-end">
+		    	<input type="checkbox" id ='payment' checked data-toggle="toggle" data-onstyle="outline-success" data-offstyle="outline-danger" data-width="130.67" data-on="Оплачено" data-off="Долг">
+		    	{% if not payment_state %}
+		    		<script type="text/javascript">$('#payment').bootstrapToggle('off')</script>
+		    	{% endif %}
+	        </div>
+	        <br>
+	    	<div class="row justify-content-end">
 	    		<button id="save" tupe="button" class="btn btn-success btn-lg">Сохранить</button>
 	    	</div>
+	    	
 		</div>
 	
 		

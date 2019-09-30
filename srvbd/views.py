@@ -2,6 +2,7 @@
 from django.shortcuts import render,redirect
 from django.http import HttpResponse,JsonResponse
 from django.template import loader
+from django.core.paginator import Paginator
 from .models import *
 from .forms import *
 from django.views.generic import View
@@ -16,7 +17,9 @@ from time import sleep
 import requests
 import json
 import telepot
-
+from django.core.paginator import *
+import datetime
+from collections import namedtuple
 #from . import utils
 from srvbd.utils import *
 
@@ -27,11 +30,11 @@ def index(request):
 
 
 def person_list(request):
-
-    person_last_add = Person.objects.order_by('-pub_date')[:20]
-    template = loader.get_template('srvbd/person_list.html')
-    context = {'person_last_add': person_last_add}
-    return HttpResponse(template.render(context,request))
+    if request.method == 'GET':
+        person_last_add = Person.objects.all().order_by('-pub_date')[:20]
+        template = loader.get_template('srvbd/person_list.html')
+        context = {'person_last_add': person_last_add}
+        return HttpResponse(template.render(context,request))
 
 
 def person_create(request):
@@ -420,8 +423,7 @@ class CreateSalesToCustomer(View):
         person = PersonCreate(data)
         if data_exchange_rates.is_valid():
             bar = data_exchange_rates.save()
-        else: return render(request, 'srvbd/create_sales_to_customer.html', {'exchange_rates':data_exchange_rates})
-
+        else: return render(request, 'srvbd/create_sales_to_customer.html', {'exchange_rates':data_exchange_rates.errors})
         if person.is_valid():
             obj = person.save()
             foo = SalesPersonInvoice(person_attach=obj,exchange_rates=bar)
@@ -444,20 +446,13 @@ class CreateSalesToCustomer(View):
 class SalesToCustomer(View):
 
     def get(self,request,invoice_id):
+        #import pdb
+        #pdb.set_trace()
         if request.is_ajax():
-            obj = list(MaterialSaleObject.objects.filter(person_invoice_attach_id=int(invoice_id)).values(
+            obj = MaterialSaleObject.objects.filter(person_invoice_attach=invoice_id).values(
                 'detail_attach__detail_name__name', 'detail_attach__detail_name__part_num',
                 'detail_attach__detail_name__specification',
-                'quantity', 'detail_attach__incoming_price','sale_price', 'id',
-            ))
-            """
-            obj = MaterialSaleObject.objects.filter(person_invoice_attach_id=invoice_id).annotate(sum_exchange=Round2((
-                F('detail_attach__incoming_price') / F('detail_attach__attach_for_incoming__exchange_rates__exchange_rates')) *
-                F('person_invoice_attach__exchange_rates__exchange_rates'))).values(
-                'detail_attach__detail_name__name', 'detail_attach__detail_name__part_num',
-                'detail_attach__detail_name__specification',
-                'detail_attach__quantity', 'detail_attach__incoming_price', 'sum_exchange', 'id')
-            """
+                'quantity', 'detail_attach__incoming_price','sale_price', 'id',)
             if obj:
                 return JsonResponse(list(obj),safe=False)
             else: return HttpResponse(status=404)
@@ -471,22 +466,41 @@ class SalesToCustomer(View):
                 'person': obj.person_attach,
                 'specification_filter': IncomInfoShipper(),
                 'detail_filter': FilterDetail(),
+                'payment_state':obj.payment_state
             }
             return render(request,'srvbd/sales_to_customer.html',context)
 
+
     def post(self,request,invoice_id):
         if request.is_ajax():
-            obj = MaterialSaleObject.objects.filter(person_invoice_attach=invoice_id).select_related('detail_attach')
+            obj = MaterialSaleObject.objects.filter(person_invoice_attach=invoice_id).select_related(
+                'detail_attach')
             for item in obj:
+                if item.quantity == 0:
+                    item.delete()
+                    continue
+                invc = item.quantity * item.sale_price
                 item.detail_attach.quantity = item.detail_attach.quantity - item.quantity
                 if item.detail_attach.quantity < 0 :
                     return JsonResponse({'quant_val_error': item.id})
                 if item.detail_attach.quantity == 0:
                     item.detail_attach.status_delete = True
-            if obj:
                 item.detail_attach.save()
-                SalesPersonInvoice.objects.filter(id=invoice_id).update(status=True)
-                return HttpResponse(status=200)
+            if obj:
+                sum_invoice = MaterialSaleObject.objects.filter(person_invoice_attach=invoice_id).aggregate(
+                    sum_sales=Sum(F('quantity') * F('sale_price')))
+                if request.POST['payment_status']:
+                    payment_status = request.POST['payment_status']
+                    if payment_status == 'true':
+                        payment_status = True
+                    elif payment_status == 'false':
+                        payment_status = False
+                    else: return HttpResponse(status=403)
+                else:
+                    return HttpResponse(status=403)
+                SalesPersonInvoice.objects.filter(id=invoice_id).update(status=True,invoice_sum=sum_invoice['sum_sales'],
+                                                                        payment_state=payment_status)
+                return redirect('/sales_invoice/{}'.format(invoice_id))
             else: return HttpResponse(status=404)
 
 
@@ -550,15 +564,14 @@ def sales_to_customer_add_detail(request,invoice_id):
             return JsonResponse({'error':'Эта запчасть уже есть в списке!'},safe=False)
         if not SalesPersonInvoice.objects.filter(id=invoice_id).exists():
             return HttpResponse(status=404)
-
-        exchange_rates = SalesPersonInvoice.objects.filter(id=invoice_id).values('exchange_rates__exchange_rates')
-        exchange_rates = exchange_rates[0]['exchange_rates__exchange_rates']
+        exchangee_rates = SalesPersonInvoice.objects.filter(id=invoice_id).values('exchange_rates__exchange_rates')
+        exchangee_rates = exchangee_rates[0]['exchange_rates__exchange_rates']
         detail_info = Detail.objects.filter(id=int(data)).values('incoming_price',
                                                                       'attach_for_incoming__exchange_rates__exchange_rates')
         detail_info = detail_info[0]
         incoming_price = detail_info['incoming_price']
         incoming_exchange_rates = detail_info['attach_for_incoming__exchange_rates__exchange_rates']
-        val = (incoming_price / incoming_exchange_rates) * exchange_rates
+        val = (incoming_price / incoming_exchange_rates) * exchangee_rates
         print(val)
         obj = MaterialSaleObject.objects.create(detail_attach_id=int(data), person_invoice_attach_id=invoice_id,sale_price=val)
 
@@ -633,6 +646,56 @@ def sales_to_customer_change_quant_price(request):
             else:
                 return JsonResponse({'error': 'Кол-во не больше фактического - "{}"'.format(res)})
     else: return HttpResponse(status=403)
+
+
+
+
+class Sales_to_customer_list(View):
+    def get(self,request):
+        if request.is_ajax():
+            quer = SalesPersonInvoice.objects.all().annotate(
+                full_name=Concat('person_attach__last_name',V(' '),'person_attach__first_name',V(' '),
+                                 'person_attach__patronymic_name')).values(
+                'id', 'full_name','date_create', 'status', 'payment_state','date_of_payment','invoice_sum').order_by('-id')
+            obj = Paginator(quer,25)
+            if request.GET.get('page'):
+                try:
+                    obj = obj.page(request.GET['page'])
+                except InvalidPage:
+                    return HttpResponse(status=404)
+            else: obj.get_page(1)
+            print(request.GET['page'])
+            if obj:
+                for i in obj:
+                    try:
+                        i['date_create'] = i['date_create'].strftime("%d.%m.%Y %H:%M")
+                    except KeyError:
+                        continue
+            Template = namedtuple('Sale_to_customer_list','id full_name date_create status payment_state date_of_payment invoice_sum')
+            new_obj = [ Template(**i) for i in obj]
+            return JsonResponse(new_obj,safe=False)
+
+        else:
+            return render(request,'srvbd/sales_to_customer_list.html')
+
+
+
+
+class Sales_invoice(View):
+    def get(self,request,sales_invoice):
+        obj = SalesPersonInvoice.objects.filter(id=sales_invoice).values(
+            'person_attach__last_name','person_attach__first_name','person_attach__patronymic_name','person_attach__tell',
+            'exchange_rates','status','payment_state','invoice_sum')
+        details = MaterialSaleObject.objects.filter(person_invoice_attach=sales_invoice).annotate(
+            sum=F('sale_price')*F('quantity')).values('sum','detail_attach__detail_name__name','detail_attach__detail_name__part_num',
+                                                     'detail_attach__detail_name__specification','detail_attach__detail_name__id',
+                                                     'quantity','sale_price')
+        #import pdb
+        #pdb.set_trace()
+        return render(request,'srvbd/sales_invoice.html',{'person_data':obj,'details':details})
+
+
+
 
 
 
