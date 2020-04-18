@@ -28,7 +28,6 @@ def index(request):
     return render(request, 'srvbd/index.html')
 
 
-
 def person_list(request):
     if request.method == 'GET':
         person_last_add = Person.objects.all().order_by('-pub_date')[:20]
@@ -472,6 +471,8 @@ class SalesToCustomer(View):
 
 
     def post(self,request,invoice_id):
+        import pdb
+        pdb.set_trace()
         if request.is_ajax():
             obj = MaterialSaleObject.objects.filter(person_invoice_attach=invoice_id).select_related(
                 'detail_attach')

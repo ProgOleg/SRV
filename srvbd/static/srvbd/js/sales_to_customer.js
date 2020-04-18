@@ -137,6 +137,7 @@ jQuery(document).ready(function($) {
 		var payment_status = $('#payment').prop("checked")
 		var url = $('div.container').data('index-url')
 		$.post(url,{'payment_status': payment_status},function(data,statusText) {
+			console.log(data)
 			if (statusText === 'success' && data){
 				if ('quant_val_error' in data){
 					$(`#${data['quant_val_error']}`).addClass('error')
