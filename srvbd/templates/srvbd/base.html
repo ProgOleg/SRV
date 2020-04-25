@@ -32,24 +32,24 @@
       </button>
   		<div class="collapse navbar-collapse" id="navbarSupportedContent">
   	  		<ul class="navbar-nav mr-auto">
-  	    		<li class="nav-item active">
-  	      			<a class="nav-link dropdown-toggle mb-0 h5" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Хьюманы</a>
-        				<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+  	    		<li class="nav-item dropdown">
+  	      			<a class="nav-link dropdown-toggle mb-0 h5"  href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Люди</a>
+        				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
           				<a class="dropdown-item" href="{% url 'person_list'%}">Список клиентов</a>
           				<a class="dropdown-item" href="{% url 'shipper_url'%}">Список поставщиков</a>
           				<a class="dropdown-item" href="{% url 'create_persons_url'%}">Добавить клиента</a>
           				<a class="dropdown-item" href="{% url 'create_shipper_url'%}">Добавить поставщика</a>
         				</div>
   	    		</li>
-  	    		<li class="nav-item active">
-  	      			<a class="nav-link dropdown-toggle mb-0 h5" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Справочники</a>
-        				<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+  	    		<li class="nav-item dropdown">
+  	      			<a class="nav-link dropdown-toggle mb-0 h5" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Справочники</a>
+        				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
           				<a class="dropdown-item" href="{% url 'add_part_url'%}">Запчасть в справочник</a>
                   <a class="dropdown-item" href="{% url 'add_device_url'%}">Устройство в справочник</a>
           				<a class="dropdown-item" href="{% url 'spare_parts_manual_list'%}">Справочник запчастей</a>
         				</div>
   	    		</li>
-            <li class="nav-item active">
+            <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle mb-0 h5" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Склад</a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                   <a class="dropdown-item" href="{% url 'create_sales_to_customer_url' %}">Расходный ордер на клиента</a>
@@ -60,6 +60,8 @@
                 </div>
             </li>
   	  		</ul>
+          <span class="navbar-text h6">Пользователь: {{user}}</span>
+          <form action="{% url 'logout_url' %}" method="post">{% csrf_token %}<button type="submit" class="btn btn-danger ml-2">Выход</button></form>
   		</div>
   	</nav>
 
