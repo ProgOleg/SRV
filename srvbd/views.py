@@ -35,7 +35,7 @@ class AuthUser(LoginView):
     redirect_field_name = ''
 
 
-class LogOut(LoginRequiredMixin, LogoutView):
+class LogOut(LogoutView):
     pass
 
 @login_required
