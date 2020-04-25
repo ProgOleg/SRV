@@ -3,6 +3,8 @@ from . import *
 from . import views
 
 urlpatterns = [
+    path('login/',views.AuthUser.as_view(),name = 'auth_user'),
+    path('logout/',views.LogOut.as_view(),name = 'logout_url'),
     path('', views.index, name = 'index_url'),
     #Клиенты
     path('person/', views.person_list, name='person_list'),

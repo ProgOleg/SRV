@@ -22,20 +22,36 @@ import datetime
 from collections import namedtuple
 #from . import utils
 from srvbd.utils import *
+from django.contrib.auth.views import LoginView,LogoutView
+from django.urls import reverse_lazy
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 
+
+class AuthUser(LoginView):
+    template_name = 'srvbd/auth_user.html'
+    form_class = AuthUserForm
+    success_url = reverse_lazy('index_url')
+    redirect_field_name = ''
+
+
+class LogOut(LoginRequiredMixin, LogoutView):
+    pass
+
+@login_required
 def index(request):
 
     return render(request, 'srvbd/index.html')
 
-
+@login_required
 def person_list(request):
     if request.method == 'GET':
-        person_last_add = Person.objects.all().order_by('-pub_date')[:20]
+        person_last_add = Person.objects.order_by('-pub_date')[:20]
         template = loader.get_template('srvbd/person_list.html')
         context = {'person_last_add': person_last_add}
         return HttpResponse(template.render(context,request))
 
-
+@login_required
 def person_create(request):
 
     if request.method == 'GET':
@@ -52,7 +68,7 @@ def person_create(request):
 
 
 
-
+@login_required
 def spar_part_add(request):
     context = {
         'form': AddPart(),
@@ -123,7 +139,7 @@ def spar_part_add(request):
 
     else: return HttpResponse(status=404)
 
-
+@login_required
 def spare_parts_manual(request):
     if request.method == 'GET':
         parts_manual_list = SparPart.objects.order_by('-id')[:100]
@@ -134,7 +150,7 @@ def spare_parts_manual(request):
     return render(request, 'srvbd/spare_parts_manual.html',context)
 
 
-
+@login_required
 def shipper_create(request):
     if request.method == "GET":
         return render(request,'srvbd/shipper_create.html',{'ship_create':ShipperCreate()})
@@ -145,21 +161,21 @@ def shipper_create(request):
             return render(request, 'srvbd/shipper_create.html', {'ship_create': ShipperCreate()})
         else: return render(request,'srvbd/shipper_create.html',{'ship_create':ShipperCreate(request.POST)})
 
-
+@login_required
 def shippers_list(request):
     ship_list = Shipper.objects.order_by('-id')[:100]
     return render(request, 'srvbd/shippers_list.html',{'ship_list': ship_list})
 
 
 
-class IncomingList(View):
+class IncomingList(LoginRequiredMixin, View):
 
     def get(self,request):
         all_incom = Incoming.objects.all()
         return render(request,'srvbd/incom_list.html', {'all_incoming':all_incom})
 
 
-class IncomingListDetail(View):
+class IncomingListDetail(LoginRequiredMixin, View):
 
     def get(self,request,identifier):
         if Incoming.objects.get(id=identifier):
@@ -176,7 +192,7 @@ class IncomingListDetail(View):
 
 
 
-class DetailInStockView(View):
+class DetailInStockView(LoginRequiredMixin, View):
 
 
     def get(self,request):
@@ -191,7 +207,7 @@ class DetailInStockView(View):
 
 
 
-class CreateIncoming(View):
+class CreateIncoming(LoginRequiredMixin, View):
 
     context = {
         'incming_stat_false': Incoming.objects.filter(status = False),
@@ -220,7 +236,7 @@ class CreateIncoming(View):
 
 
 
-class EditIncoming(View):
+class EditIncoming(LoginRequiredMixin, View):
     choice_appliances = TypeAppliances.objects.all()
     choice_type_sparpart = TypeSparPart.objects.all()
     choice_manufacturer = Manufacturer.objects.all()
@@ -259,7 +275,7 @@ class EditIncoming(View):
 
 
 
-
+@login_required
 def tools_ajax_create_incom_filter(request):
     if request.method=='GET':
         data = IncomInfoShipper(request.GET)
@@ -299,7 +315,7 @@ def tools_ajax_create_incom_filter(request):
             return JsonResponse(new_data,safe=False)
 
 
-
+@login_required
 def tools_ajax_create_incom_detail(request,incom_id):
     if request.method == 'POST':
         data = request.POST
@@ -317,7 +333,7 @@ def tools_ajax_create_incom_detail(request,incom_id):
     else: return HttpResponse(status=404)
 
 
-
+@login_required
 def tools_ajax_create_incom_change_detail(request,incom_id):
     if request.method == 'POST':
         data = request.POST
@@ -335,7 +351,7 @@ def tools_ajax_create_incom_change_detail(request,incom_id):
     else: return HttpResponse(status=404)
 
 
-
+@login_required
 def tools_ajax_create_incom_delete_detail(request,incom_id):
     if request.method == 'POST':
         data = request.POST
@@ -351,7 +367,7 @@ def tools_ajax_create_incom_delete_detail(request,incom_id):
 
 
 
-class AddDevice(View):
+class AddDevice(LoginRequiredMixin, View):
 
     def get(self,request):
         context = {'form': AddDeviceForm(),'select_form':SelectManufacturTypeAppliances()}
@@ -386,7 +402,7 @@ class AddDevice(View):
 
 
 
-
+@login_required
 def tools_ajax_add_part_set_list(request):
     if request.is_ajax():
         if request.method == 'GET':
@@ -407,7 +423,7 @@ def tools_ajax_add_part_set_list(request):
 
 
 
-class CreateSalesToCustomer(View):
+class CreateSalesToCustomer(LoginRequiredMixin, View):
 
     def get(self,request):
         context = {
@@ -442,7 +458,7 @@ class CreateSalesToCustomer(View):
 
 
 
-class SalesToCustomer(View):
+class SalesToCustomer(LoginRequiredMixin, View):
 
     def get(self,request,invoice_id):
         #import pdb
@@ -504,7 +520,7 @@ class SalesToCustomer(View):
                 return redirect('/sales_invoice/{}'.format(invoice_id))
             else: return HttpResponse(status=404)
 
-
+@login_required
 def sales_to_customer_filter(request):
     if request.method=='GET' and request.is_ajax():
         data = request.GET
@@ -556,7 +572,7 @@ def sales_to_customer_filter(request):
         return JsonResponse(obj,safe=False)
     return HttpResponse(status=404)
 
-
+@login_required
 def sales_to_customer_add_detail(request,invoice_id):
 
     if request.method == 'POST' and request.is_ajax():
@@ -586,7 +602,7 @@ def sales_to_customer_add_detail(request,invoice_id):
     else:return HttpResponse(status=404)
 
 
-
+@login_required
 def sales_to_customer_delete_detail(request):
     if request.method == 'POST' and request.is_ajax():
         data = int(request.POST['delete_obj'])
@@ -651,7 +667,7 @@ def sales_to_customer_change_quant_price(request):
 
 
 
-class Sales_to_customer_list(View):
+class Sales_to_customer_list(LoginRequiredMixin, View):
     def get(self,request):
         if request.is_ajax():
             quer = SalesPersonInvoice.objects.all().annotate(
@@ -699,7 +715,7 @@ class Sales_invoice(View):
 
 
 
-
+@login_required
 def tools_ajax_exchange_rates_usd_privat24(request):
     if request.method == 'GET' and request.is_ajax():
         result = tools_get_exchange_rates_USD_privat24()
@@ -712,7 +728,7 @@ def tools_ajax_exchange_rates_usd_privat24(request):
     else: return HttpResponse(status=403)
 
 
-
+@login_required
 def telegram_bot(request):
     token = '582672380:AAHxkZmTD6HvoOaOCoAZY7kq66Mz3Xw3qVI'
     url = 'https://api.telegram.org/bot{}/'.format(token)
@@ -750,7 +766,7 @@ def telegram_bot(request):
 
     return render(request, 'srvbd/index.html',{'context':context})
 
-
+@login_required
 def telegram_hook(request):
     if request.method == 'POST':
         print(request.POST)

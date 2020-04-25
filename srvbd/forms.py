@@ -3,6 +3,9 @@ from .models import *
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.core.exceptions import ValidationError
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.models import User
+
 
 #***__Добавление клиента__***
 class PersonCreate(forms.ModelForm):
@@ -214,7 +217,10 @@ class ExchangeRatesForm(forms.ModelForm):
 
 
 
-
+class AuthUserForm(AuthenticationForm,forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('username','password')
 
 
 
