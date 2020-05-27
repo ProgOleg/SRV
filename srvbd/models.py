@@ -3,9 +3,17 @@ from django.utils import timezone
 from django.db.models.functions import Concat
 from django.db.models import Value as V
 from django.db.models import Sum
-#***_Клиенты_***
+
 
 class Person(models.Model):
+    MASTER = 'MA'
+    CLIENT = 'CL'
+
+    PERSON_ROLE = [
+        (MASTER,'Мастер'),
+        (CLIENT,'Клиент')
+    ]
+
     first_name = models.CharField("Имя", max_length=30)
     last_name = models.CharField("Фамилия",max_length=30)
     patronymic_name = models.CharField("Отчество",max_length=30)
@@ -13,15 +21,22 @@ class Person(models.Model):
     addres = models.CharField("Адресс",max_length=200,blank=True)
     email = models.EmailField("Почта",max_length=254,blank=True)
     pub_date = models.DateTimeField(auto_now_add = True)
+    discount = models.FloatField(default=0,null=True)
+    role = models.CharField(max_length=2,choices=PERSON_ROLE,default=CLIENT)
+
 
     def __str__(self):
-        return "{} {}.{}, {}".format(self.last_name, self.first_name[0],self.patronymic_name[0],self.tell)
+        return "{} {}.{}, {}".format(self.last_name, self.first_name[0],self.patronymic_name[0],self.person_role)
 
     @property
     def fulll_name(self):
         "Returns the person's full name."
         return '%s %s' % (self.first_name, self.last_name)
 
+
+class Markup(models.Model):
+
+    markup = models.FloatField(default=2)
 
 #***_Запчасти справочник_***
 
@@ -71,7 +86,7 @@ class Manufacturer(models.Model):
 
     def __str__(self):
         return str(self.manufacturer)
-
+ 
 
 #***__Приходы зачастей__***
 
@@ -95,6 +110,7 @@ class Shipper(models.Model):
     first_name = models.CharField("Имя", max_length=30)
     last_name = models.CharField("Фамилия", max_length=30)
     patronymic_name = models.CharField("Отчество", max_length=30)
+    store_website = models.CharField('Сайт магазина',max_length=100,null=True,default=None)
     specification = models.CharField("Описание",max_length=50,blank=True,unique=True)
 
 
@@ -107,8 +123,8 @@ class Shipper(models.Model):
 class DetailInIncomList(models.Model):
     spar_part = models.ForeignKey('SparPart', on_delete=models.SET_NULL, related_name='detail_detail_in_list',null=True)
     selector_incom = models.ForeignKey('Incoming', on_delete=models.SET_NULL, related_name='select_incom',null=True)
-    incoming_price = models.DecimalField(max_digits=6, decimal_places=2,default=0)
-    quantity = models.DecimalField(max_digits=6, decimal_places=2,default=0)
+    incoming_price = models.FloatField(default=0, null=True)
+    quantity = models.FloatField(default=0, null=True)
 
 
     def __str__(self):
@@ -119,8 +135,8 @@ class DetailInIncomList(models.Model):
 
 class Detail(models.Model):
     detail_name = models.ForeignKey('SparPart', on_delete=models.SET_NULL, related_name='detail_in_detail',null=True)
-    incoming_price = models.DecimalField(max_digits=6, decimal_places=2,default=0,null=True)
-    quantity = models.DecimalField(max_digits=6, decimal_places=2,default=0,null=True)
+    incoming_price = models.FloatField(default=0,null=True)
+    quantity = models.FloatField(default=0,null=True)
     attach_for_incoming = models.ForeignKey('Incoming',on_delete=models.SET_NULL,related_name='attash_incom',null=True)
     status_delete = models.BooleanField(default=False)
 
@@ -187,8 +203,8 @@ class VirtualSaleObject(models.Model):
     person_invoice_attach = models.ForeignKey("SalesPersonInvoice", on_delete=models.SET_NULL, related_name='virtual_person_invoice',
                                               default=None,null=True)
 
-    quantity = models.DecimalField(max_digits=6, decimal_places=2)
-    sale_price = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+    quantity = models.FloatField(default=0,null=True)
+    sale_price = models.FloatField(default=0,null=True)
 
 
     def __str__(self):
@@ -205,8 +221,8 @@ class MaterialSaleObject(models.Model):
     person_invoice_attach = models.ForeignKey("SalesPersonInvoice", on_delete=models.SET_NULL, related_name='material_person_invoice',
                                               default=None,null=True)
 
-    quantity = models.DecimalField(max_digits=6, decimal_places=2,default=0,null=True)
-    sale_price = models.DecimalField(max_digits=6, decimal_places=2, default=0,null=True)
+    quantity = models.FloatField(default=0,null=True)
+    sale_price = models.FloatField(default=0,null=True)
 
 
     def __str__(self):
@@ -220,7 +236,7 @@ class SalesPersonInvoice(models.Model):
     exchange_rates = models.ForeignKey('ExchangeRates', on_delete=models.SET_NULL, null=True, default=None,
                                        related_name='sale_person_exchange_rates')
 
-    invoice_sum = models.DecimalField(max_digits=15, decimal_places=2,null=True)
+    invoice_sum = models.FloatField(default=0,null=True)
     date_create = models.DateTimeField(auto_now_add=True)
     status = models.BooleanField(default=False)
     payment_state = models.BooleanField(default=False)
@@ -237,7 +253,7 @@ class RepairInvoice(models.Model):
     exchange_rates = models.ForeignKey('ExchangeRates', on_delete=models.SET_NULL, null=True, default=None,
                                         related_name='repair_exchange_rates')
 
-    invoice_sum = models.DecimalField(max_digits=6, decimal_places=2)
+    invoice_sum = models.FloatField(default=0,null=True)
     date_create = models.DateTimeField(auto_now_add=True)
     status = models.BooleanField(default=False)
 
@@ -249,11 +265,13 @@ class RepairInvoice(models.Model):
 class ExchangeRates(models.Model):
 
     data_create = models.DateField(auto_now_add=True)
-    exchange_rates = models.DecimalField(max_digits=6,decimal_places=2,default=0,null=True)
+    exchange_rates = models.FloatField(default=0,null=True)
     status_own_change = models.BooleanField(default=False)
 
     def __str__(self):
         return "{}, {}".format(self.exchange_rates,self.data_create)
+
+
 
 
 

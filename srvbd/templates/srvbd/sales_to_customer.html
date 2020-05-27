@@ -10,7 +10,7 @@
 				</div>
 				<hr>
 				<div class="row">
-					<h4>Клиент:</h2>
+					<h4>Покупатель:</h2>
 				</div>
 				<dl class="row">
 					<dt class="col-sm-3">Фамилия:</dt>
@@ -24,7 +24,7 @@
 				</dl>
 				<hr>
 				<div class="row">
-					<h4>Выберите запчасть</h4>
+					<h4>Фильтр</h4>
 				</div>
 				<div class="row justify-content-between">
 					<div class="col-md-6">
@@ -34,7 +34,7 @@
 	    			<div class="col-md-4">
 						<label for="select_applience">Выберите тип устройства:</label>
 	    				{{specification_filter.attachment_appliances}}
-	    				<datalist id="select_applience"></datalist>
+	    				<datalist id="attachment_appliances"></datalist>
 	    			</div>
 				</div>
 				<div class="row justify-content-between">
@@ -45,7 +45,7 @@
 	    			<div class="col-md-4">
 	    				<label for="select_type_sparpart">Выберите тип запчасти:</label>
 	    				{{specification_filter.attachment_part}}
-	    				<datalist id="select_type_sparpart"></datalist>
+	    				<datalist id="attachment_part"></datalist>
 	    			</div>
 				</div>
 				<div class="row justify-content-between">
@@ -56,7 +56,7 @@
 	    			<div class="col-md-4">
 	    				<label for="select_manufacturer">Выберите производителя:</label>
 	    				{{specification_filter.attachment_manufacturer}}
-	    				<datalist id="select_manufacturer"></datalist>
+	    				<datalist id="attachment_manufacturer"></datalist>
 	    			</div>
 				</div>
 				
@@ -80,7 +80,7 @@
 		      				<th scope="col">Вид устройства</th>
 		      				<th scope="col">Производитель</th>
 		              		<th scope="col">Приход</th>
-		              		<th scope="col">Количество</th>
+		              		<th scope="col">Кол-во</th>
 		              		<th scope="col">Стоимость</th>
 		              		<th scope="col">Дейсвие</th>
 		    			</tr>

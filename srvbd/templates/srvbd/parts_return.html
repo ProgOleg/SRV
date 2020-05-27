@@ -1,0 +1,120 @@
+{% extends 'srvbd/base.html' %}
+{% load static %}
+{% block content %}
+	<script type="text/javascript" src="{% static 'srvbd/js/parts_return.js' %}"></script>
+	<div class="container">
+		<div class="row">
+			<h3>Возврат запчастей</h3>
+		</div>
+		<hr>
+		<div class="row">
+			<h4>Клиент:</h4>
+		</div>
+		{% if person_data %}
+			{% for person in person_data %}
+				<div class="row">
+					<div class="col-6">
+						<dl class="row">
+							<dt class="col-sm-4">Фамилия:</dt>
+							<dd class="col-sm-8">{{person.person_attach__last_name}}</dd>
+							<dt class="col-sm-4">Имя:</dt>
+							<dd class="col-sm-8">{{person.person_attach__first_name}}</dd>
+							<dt class="col-sm-4">Отчесвто:</dt>
+							<dd class="col-sm-8">{{person.person_attach__patronymic_name}}</dd>
+							<dt class="col-sm-4">Телефон:</dt>
+							<dd class="col-sm-8">{{person.person_attach__tell}}</dd>
+						</dl>
+					</div>
+					<div class="col-6">
+						<dl class="row">
+							<dt class="col-sm-4">Дата выдачи:</dt>
+							<dd class="col-sm-8">{{person.date_create}}</dd>
+							<dt class="col-sm-4">Статус оплаты:</dt>
+							<dd class="col-sm-8">{{person.payment_state}}</dd>
+							<dt class="col-sm-4">Курс:</dt>
+							<dd class="col-sm-8">{{person.exchange_rates__exchange_rates}}</dd>
+							<dt class="col-sm-4">Сумма:</dt>
+							<dd class="col-sm-8">{{person.invoice_sum}}</dd>
+						</dl>
+					</div>
+				</div>
+			{% endfor %}
+		{% endif %}
+		<hr>
+		<div class="row">
+			<h4>Запчасти:</h4>
+		</div>
+    	<br>	
+    	<div class="row justify-content-center">
+				<table class="table table-striped table table-bordered" >
+		  			<thead class="thead-dark table-condensed table-bordered table-hover">
+		    			<tr>
+		    				<th scope="col">id</th>
+		      				<th scope="col">Наименование</th>
+		     		 		<th scope="col">Парт.</th>
+		      				<th scope="col">Описание</th>
+		      				<th scope="col">Кол. вернуть</th>
+		      				<th scope="col">Кол. проданного</th>
+		      				<th scope="col">Цена</th>
+		      				<!--<th scope="col">Действие</th>-->
+		    			</tr>
+		  			</thead>
+			  			<tbody id="parts" data-ajax_url="{% url 'parts_return_url' inv_id %}">
+			  				{% if parts %}
+				    			{% for part in parts%}
+									<tr>
+										<td>{{part.detail_attach__detail_name__id}}</td>
+										<td>{{part.detail_attach__detail_name__name}}</td>
+										<td>{{part.detail_attach__detail_name__part_num}}</td>
+										<td>{{part.detail_attach__detail_name__specification}}</td>
+										<td><input type="number" data-part-id ="{{part.id}}"  name="quantity" max="{{part.quantity}}" min="0" value="0"></td>
+										<td>{{part.quantity}}</td>
+										<td>{{part.sale_price}}</td>
+										<!--<td><button type="button" id="delete" class="btn btn-danger" value="{{part.id}}">Вернуть</button></td>-->
+									</tr>
+								{% endfor %}
+			  				{% endif %}
+						</tbody>
+		    	</table>
+	    </div>
+	    <div class="row justify-content-end">
+    		<button id="return_all" type="button" class="btn btn-danger btn-lg" >Вернуть все</button>
+    	</div>
+	    <div class="row justify-content-end mt-2">
+    		<button id="save" type="button" class="btn btn-success btn-lg">Сохранить</button>
+    	</div>
+	</div>
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% endblock %}

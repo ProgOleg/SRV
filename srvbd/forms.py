@@ -12,7 +12,7 @@ class PersonCreate(forms.ModelForm):
 
     class Meta:
         model = Person
-        fields = ['first_name', 'last_name', 'patronymic_name', 'tell', 'addres', 'email',]
+        fields = ['first_name', 'last_name', 'patronymic_name', 'tell', 'addres', 'email','role','discount']
 
         widgets = {
             'first_name': forms.TextInput(attrs= {'class': 'form-control','placeholder':'Введите имя',}),
@@ -21,7 +21,8 @@ class PersonCreate(forms.ModelForm):
             'tell': forms.TextInput(attrs={'class': 'form-control','placeholder':'Введите номер телефона','value':"+380"}),
             'addres': forms.TextInput(attrs={'class': 'form-control','placeholder':'Введите адрес'}),
             'email': forms.TextInput(attrs={'class': 'form-control','placeholder':'Введите email'}),
-
+            'role' : forms.Select(attrs={'class': 'form-control','id':'role'}),
+            'discount' : forms.NumberInput(attrs={'class': 'form-control','id':'discount'})
         }
 
 
@@ -214,6 +215,12 @@ class ExchangeRatesForm(forms.ModelForm):
         fields = ['exchange_rates']
         widgets = {'exchange_rates': forms.NumberInput(attrs={'class':'form-control','placeholder':"Укажите курс 'USD'",
                                                        'step':'0.01','value':'0.00'})}
+
+    def clean_exchange_rates(self):
+        data = self.cleaned_data['exchange_rates']
+        if float(data) < 1:
+            self.add_error(error = 'курс не может быть меньше еденицы',field='exchange_rates')
+        return data
 
 
 

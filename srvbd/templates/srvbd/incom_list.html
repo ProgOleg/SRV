@@ -26,7 +26,13 @@
     				{% for incom in all_incoming %}
     			<tr>
   				  <th scope="row">{{incom.id}}</th>
-  				  <td><a href="/incoming_list/get_{{incom.id}}/">{{incom.incoming_date}}</a></td>
+  				  <td><a href="
+              {% if incom.status %}
+              {% url 'incom_list_detail_url' incom.id %}
+              {% else%}
+              {% url 'edit_incoming_url' incom.id %}
+              {% endif %}
+              ">{{incom.incoming_date}}</a></td>
   				  <td>{{incom.ship}}</td>
   				  <td>{{incom.exchange_rates}}</td>
   				  <td></td>

@@ -8,7 +8,7 @@
 	<form action="{% url 'create_sales_to_customer_url' %}" method="post">
 		{% csrf_token %}
 		<div class="container">
-			<div class="row">
+			<div class="form-row">
 				<div class="col-md-4">
 					<label>Фамилия:</label>
 					{{person_create.last_name}}
@@ -34,7 +34,7 @@
 					{% endif %}
 				</div>
 			</div>
-			<div class="row">
+			<div class="form-row">
 				<div class="col-md-6">
 					<label>Адрес:</label>
 					{{person_create.addres}}
@@ -60,19 +60,28 @@
 					{% endif %}
 				</div>
 			</div>
-			<div class="row">
-				<div class="col-md-4">
+			<div class="form-row">
+				<div class="col-md-6">
 					<label>Телефон:</label>
-					{{person_create.tell}}
-					{% if person_create.errors.tell %}
-						<div class="invalid-feedback">{{ person_create.errors.tell }}</div>
-						<script type="text/javascript"> $('input[name="tell"]').addClass('is-invalid') </script>
-					{% endif %}
+						{{person_create.tell}}
+							{% if person_create.errors.tell %}
+								<div class="invalid-feedback">{{ person_create.errors.tell }}</div>
+								<script type="text/javascript"> $('input[name="tell"]').addClass('is-invalid') </script>
+							{% endif %}
 				</div>
-				<div class="col-md-2 mt-4 pt-2">
+				<div class="col md-1 mt-2 pt-4">
 					<button data-url="{% url 'ajax_check_tell_url' %}" id="check_but" class="btn btn-outline-info " type="button">Чекнуть</button>
 				</div>
+				<div class="col">
+					<label>Роль:</label>
+					{{person_create.role}}
+				</div>
+				<div class="col">
+					<label>Дисконт:</label>
+					{{person_create.discount}}
+				</div>
 			</div>
+			<br>
 			<div class="row">
 				<div class="col mt-2">
 					<button type="submit" class="btn btn-success float-right">Добавить</button>

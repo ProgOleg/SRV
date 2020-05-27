@@ -20,10 +20,12 @@ urlpatterns = [
     path('add_device/',views.AddDevice.as_view(),name="add_device_url"),
     path('ajax_add_part_set_list/',views.tools_ajax_add_part_set_list,name='ajax_add_part_set_list_url'),
     #
-    path('incoming_list/get_<int:identifier>/', views.IncomingListDetail.as_view(), name='incom_list_detail_url'),
+
+    path('incoming_list/<int:incom_id>/', views.IncomingListDetail.as_view(), name='incom_list_detail_url'),
     path('incoming_list/',views.IncomingList.as_view(),name='incom_list_url'),
     #
     path('deteil_in_stock/',views.DetailInStockView.as_view(),name='detail_in_stock_url'),
+    path('ajax_detail_in_stock_filter/<int:page>/',views.ajax_detail_in_stock_filter,name='ajax_detail_in_stock_filter'),
     #
     path('create_incoming/', views.CreateIncoming.as_view(),name='create_incoming_url'),
     path('create_incoming/<int:incom_id>/', views.EditIncoming.as_view(), name='edit_incoming_url'),
@@ -46,6 +48,10 @@ urlpatterns = [
     path('ajax_tools_sales_to_customer_change_quant_price',views.sales_to_customer_change_quant_price,name='ajax_sales_to_customer_change_quant_price'),
     #Список продажных ордеров
     path('sales_to_customer_list',views.Sales_to_customer_list.as_view(),name='sales_to_customer_list_url'),
+    path('ajax_tools_sales_to_customer_list_change_payment_state/',views.sales_to_customer_list_change_payment_state,name='customer_list_change_payment_state'),
+    #Возврат запчастей
+    path('parts_return/<int:invoice_id>/',views.PartsReturn.as_view(),name='parts_return_url'),
+    path('ajax_return_parts_del_part/',views.ajax_return_parts_del_part,name='ajax_url_return_parts_del_part'),
     #Продажный ордер
     path('sales_invoice/<int:sales_invoice>',views.Sales_invoice.as_view(),name='sales_invoice_url'),
     #TEST

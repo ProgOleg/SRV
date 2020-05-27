@@ -1,49 +1,91 @@
 {% extends 'srvbd/base.html' %}
 {% load static %}
 {% block content %}
+  <script type="text/javascript" src="{% static 'srvbd/js/detail_in_stock.js' %}"></script>
+  
+  <div id="new_detail" data-ajax_url="{% url 'detail_in_stock_url' %}"></div>
+  <div id="filter_url" data-ajax_url=""></div>
+  <br>
 	<div class ="container">
     <div class="row">
-      <div class="col">
-        <h3>Запчасти в наличии:</h3>
-      </div>
+        <h3>Запчасти в наличии</h3>
     </div>
-    <br>
-		<table  class="table table-striped table table-bordered" >
-  			<thead class="thead-dark table-condensed table-bordered table-hover">
-    			<tr>
-    				<th scope="col">№ ID</th>
-    				<th scope="col">Наименование</th>
-     				<th scope="col">Партномер производителя</th>
-      				<th scope="col">Описание</th>
-      				<th scope="col">Тип запчасти</th>
-      				<th scope="col">Вид устройства</th>
-      				<th scope="col">Производитель</th>
-              		<th scope="col">Приход</th>
-              		<th scope="col">Стоимость</th>
-              		<th scope="col">Кол-во</th>
-              		<th scope="col">Итого</th>
-    			</tr>
-  			</thead>
-  			<tbody>
-
-  				{% if detail %}
-    				{% for Detail in detail %}
-    			<tr>
-  				  <th scope="row">{{i.detail_name__id}}</th>
-  				  <td>{{Detail.detail_name__name}}</td>
-  				  <td>{{Detail.detail_name__part_num}}</td>
-  				  <td>{{Detail.detail_name__specification}}</td>
-  				  <td>{{Detail.detail_name__attachment_part__type_spar_part}}</td>
-  				  <td>{{Detail.detail_name__attachment_appliances__type_appliances}}</td>
-  				  <td>{{Detail.detail_name__attachment_manufacturer__manufacturer}}</td>
-                  <td>{{Detail.attach_for_incoming__incoming_date}}</td>
-            	  <td>{{Detail.incoming_price}}</td>
-                  <td>{{Detail.quantity}}</td>
-            	  <td></td>
-          		</tr>
-    				{%endfor%}
-    			{%endif%}
-    		</tbody>
-    </table>
+    <hr>
+      <div class="row">
+        <h4>Информация о складе:</h4>
+      </div>
+      <dl class="row">
+          <dt class="col-sm-3">Всего позиций:</dt>
+          <dd class="col-sm-9">{{detail_count}}</dd>
+          <dt class="col-sm-3">Всего денег:</dt>
+          <dd class="col-sm-9">{{equal_details}}</dd>
+      </dl>
+      <hr>
+      <div class="row">
+        <h4>Фильтр</h4>
+      </div>
+      <form id="filter_form" action="">
+        <div class="row justify-content-between">
+          <div class="col-md-6">
+              <label for="name">Наименование:</label>
+              {{detail_filter.name}}
+            </div>
+            <div class="col-md-4">
+            <label for="select_applience">Выберите тип устройства:</label>
+              {{specification_filter.attachment_appliances}}
+              <datalist id="attachment_appliances"></datalist>
+            </div>
+        </div>
+        <div class="row justify-content-between">
+          <div class="col-md-6">
+            <label for="specification">Описаине:</label>
+              {{detail_filter.specification}}
+            </div>
+            <div class="col-md-4">
+              <label for="select_type_sparpart">Выберите тип запчасти:</label>
+              {{specification_filter.attachment_part}}
+              <datalist id="attachment_part"></datalist>
+            </div>
+        </div>
+        <div class="row justify-content-between">
+          <div class="col-md-6">
+            <label for="part_num">Парт-номер произвоидетеля:</label>
+              {{detail_filter.part_num}}
+            </div>
+            <div class="col-md-4">
+              <label for="select_manufacturer">Выберите производителя:</label>
+              {{specification_filter.attachment_manufacturer}}
+              <datalist id="attachment_manufacturer"></datalist>
+            </div>
+        </div>
+        
+        <div class="row justify-content-end">
+          <div class="col-md-1 col-md-offset-4 mt-4">
+              <button id="but_filter" class="btn btn-success" type="submit" >Фильтр</button>
+            </div>
+          </div>  
+      </form>
+      <br>
+    <div class="row justify-content-center">
+  		<table  class="table table-striped table table-bordered" >
+    			<thead class="thead-dark table-condensed table-bordered table-hover">
+      			<tr>
+      				<th scope="col">id</th>
+      				<th scope="col">Наименование</th>
+       				<th scope="col">Партномер производителя</th>
+        				<th scope="col">Описание</th>
+        				<th scope="col">Тип запчасти</th>
+        				<th scope="col">Вид устройства</th>
+        				<th scope="col">Производитель</th>
+                <th scope="col">Приход</th>
+                <th scope="col">Кол-во</th>
+                <th scope="col">Стоимость</th>
+      			</tr>
+    			</thead>
+    			<tbody id="table_body">
+          		
+      		</tbody>
+      </table>
+    </div>
   </div>
 {% endblock %}

@@ -1,6 +1,7 @@
 {% extends 'srvbd/base.html' %}
 {% load static %}
 {% block content %}
+  <script type="text/javascript" src="{% static 'srvbd/js/person_create.js' %}"></script>
   <div class="container">
     <form action="{% url 'create_persons_url' %}" method="post">
       {% csrf_token %}
@@ -30,11 +31,19 @@
         </div>
       </div>
       <div class="form-row">
-        <div class="col">
+        <div class="col-md-5">
           <label>Телефон:</label>
           {{form.tell}}
         </div>
-        <div class="col">
+        <div class="col-md-2">
+          <label>Роль:</label>
+          {{form.role}}
+        </div>
+        <div class="col-md-1">
+          <label>Дисконт(%):</label>
+          {{form.discount}}
+        </div>
+        <div class="col-md-4">
           <label>Email:</label>
           {{form.email}}
         </div>

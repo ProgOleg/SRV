@@ -115,26 +115,36 @@ def tools_get_exchange_rates_USD_privat24():
         else:
             exchange_rate = str(get_usd_saleRate(exchange_rate))
             break
-    print(exchange_rate)
+    #print(exchange_rate)
     return exchange_rate
 
 
-def materialSaleObject_check_actual_salePrice(pk):
-    obj = MaterialSaleObject.objects.filter(id=pk).values('sale_price')
+def materialSaleObject_check_actual_salePrice(pk,new_val):
+    #место для наценки
+    obj = MaterialSaleObject.objects.filter(id=pk).values('detail_attach__incoming_price',
+                                                          'detail_attach__attach_for_incoming__exchange_rates__exchange_rates',
+                                                          'person_invoice_attach__exchange_rates__exchange_rates')
     if not obj:
         return HttpResponse(status=404)
-    val = obj[0]['sale_price']
-    return  val
+    incom_price = float(obj[0]['detail_attach__incoming_price'])
+    incom_exchange_rates = float(obj[0]['detail_attach__attach_for_incoming__exchange_rates__exchange_rates'])
+    sales_exchange_rates = float(obj[0]['person_invoice_attach__exchange_rates__exchange_rates'])
+    pice_in_currency = incom_price / incom_exchange_rates
+    price_for_sale = pice_in_currency * sales_exchange_rates
+    if price_for_sale < incom_price:
+        price_for_sale = incom_price
+    if price_for_sale > float(new_val):
+        return JsonResponse({'error': 'Цена не меньше - "{}"'.format(price_for_sale)}, safe=False)
+    return  False
 
 
 def materialSaleObject_check_actual_quantity(pk,val):
     obj_detail_quantity = MaterialSaleObject.objects.filter(id=pk).values('detail_attach__quantity')
     if not obj_detail_quantity:
         return None
-    obj_detail_quantity = obj_detail_quantity[0]['detail_attach__quantity']
-    values = Decimal(str(val))
-    if values > obj_detail_quantity:
-        return str(obj_detail_quantity)
+    obj_detail_quantity = float(obj_detail_quantity[0]['detail_attach__quantity'])
+    if float(val) > obj_detail_quantity:
+        return JsonResponse({'error': 'Кол-во не больше фактического - "{}"'.format(obj_detail_quantity)})
     else: return False
 
 
@@ -169,7 +179,7 @@ def tools_ajax_check_tell(request):
             if 'error' in valid_data:
                 return JsonResponse(valid_data,safe=False)
             obj = list(Person.objects.filter(tell=valid_data).values('first_name','last_name','patronymic_name',
-                                                                     'tell','addres','email'))
+                                                                     'tell','addres','email','discount','role'))
             if obj:
                 return JsonResponse(obj,safe=False)
             else: return JsonResponse({'message':'Телефонный номер свободный'})
