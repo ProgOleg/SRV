@@ -3,6 +3,7 @@ $('document').ready(function(){
 	var url = $('div').data('index-url')
 	$.get(url,function(data){
 		if ('massage' in data){
+			console.log(data)
 		}
 		else{
 			$('#detail_table').removeClass('remoove')
@@ -30,39 +31,69 @@ $('document').ready(function(){
 			})
 		}
 	})
+// добавляет новые объекты дата атрибуты фильтров
+	function set_option_atribut(data){
+		//data - селектора поля инпут возврщенный событием
+		//апендит datalist по 'name' attr(data)
+		//forma ajax запроса = data-ajax_url = "URL"
+		var val = data.value;
+		var element = data.name
+		var form = $(data).data('ajax_url')
+		$.get(form,{'val': val}, function(data) {
+			var obj = $(`#${element}`);
+			var item = $.map(data, function(item, index) {
+				return $('<option>').attr('value', item)});
+			obj.empty()
+			obj.append(item)
+			
+		});
+	}
+
+// Cелекторы полей фильтра
+	$('input[name="attachment_part"]').on('input',function(data){
+		var data = this
+		set_option_atribut(data)
+	});
+
+	$('input[name="attachment_appliances"]').on('input',function(data){
+		var data = this
+		set_option_atribut(data)
+	});
+
+	$('input[name="attachment_manufacturer"]').on('input',function(data){
+		var data = this
+		set_option_atribut(data)
+	});
+
 // Отправка данных с формы фильтра SparPart и рендерин таблицы отфильтрованых объектов.
-	$('#but_filter').click(function(event){
-		$('#table_body').empty()
-		$('#filter_table').removeClass('remoove')
-		var attachment_appliances = $('input[name=attachment_appliances').val();
-		var attachment_part = $('input[name=attachment_part').val();
-		var attachment_manufacturer = $('input[name=attachment_manufacturer').val();
-		var form = $('#form').attr('action');
-		var data = {};
-		data.attachment_appliances = attachment_appliances;
-		data.attachment_part = attachment_part;
-		data.attachment_manufacturer = attachment_manufacturer;
-		$.ajax({
-			url: form,
-			method: "GET",
-			data: data,
-			dataType: "JSON",
-			success: function(data){
-				$.each(data,function(i,e){
-					obj = $('<tr>');
-					$.each(this,function(i,e){
-						obj.append($('<td>').text(e));
-					});
-					knob = $('<button>').attr({'type':'button','class':'btn btn-outline-info',
-						'id':'but_detail','value':e['id']}).text('Добавить');
-					obj.append($('<td>').append(knob));
-					$('#table_body').append(obj);
+
+	$('#filter_form').submit(function(event){
+		event.preventDefault();
+		var data = $(this).serializeArray()
+		var url = this.action
+		$.get(url,data, function(data) {
+			$('#filter_table_body').empty()
+			$('#filter_table').removeClass('remoove')
+			$.each(data,function(index, el) {
+				var obj = $('<tr>')
+				$.each(this,function(index, el) {
+					//if (index !== 'id'){obj.append($('<td>').text(el))}
+					obj.append($('<td>').text(el))
 				});
-			}
+				knob = $('<button>').attr({'type':'button','class':'btn btn-outline-info',
+						'id':'but_detail','value':data[index]['id']}).text('Добавить');
+				//console.log(obj)
+				obj.append($('<td>').append(knob));
+				$('#filter_table_body').append(obj.fadeIn('400'));
+			});
 		});
 	});
+
+
+
+
 // Добавление объекта в incoming. Рендеринг таблицы с новыми запчастями.	
-	$('#table_body').on("click",'#but_detail',function(){
+	$('#filter_table_body').on("click",'#but_detail',function(){
 		var data = this.value;
 		var form = $('#form_detail').attr('action');
 		$.ajax({

@@ -31,18 +31,32 @@ $('document').ready(function() {
 			var obj = $('<tr/>',{id:data[i][0]});
 			var name = $('<td/>')
 			//ЖЕСТКО КОДИРОВАНЫЙ УРЛ!!!!!!!
-			var url = 'sales_to_customer/'
+			var url = 'sales_invoice/'
+			var url_edit = 'sales_to_customer/'
+			var url_parts_return = 'parts_return/'
 			//console.log(i)
 			$.each(this,function(index, el) {
+				//console.log(elem[index])
+				//console.log(el)
 				var foo = $('<td>')
-				if (index == 4){
+				if (index == 3){
 					if ( el == true){foo.attr('class', 'bg-success').text(el)}
 					else if (el == false) {foo.attr('class', 'bg-danger').text(el)}
 				}
-				else if (index == 0){foo.append($('<a>').text(el).attr({'href':`${url}${el}`}))}
+				else if (index == 4){
+					if ( el == true){foo.attr('class', 'bg-success').text(el)}
+					else if (el == false) {foo.append($(`<input type="checkbox"  id="payment" value =${elem[0]} >`))}
+				}//foo.attr('class', 'bg-danger').text(el)
+				else if (index == 0){
+					if (elem[3] === false){foo.append($('<a>').text(el).attr({'href':`${url_edit}${el}`}))}
+					else {foo.append($('<a>').text(el).attr({'href':`${url}${el}`}))}
+				}
 				else {foo.text(el)}
+
 				obj.append(foo)
 			});
+			if (elem[3] == true){obj.append(name.append($(`<a class="btn btn-outline-info" role="button" href="${url_parts_return+elem[0]}" >Возврат</a>`)))}
+			else {obj.append(name.append($(`<a class="btn btn-outline-danger" role="button" href="#" disabled >Возврат</a>`)))}
 			$('#table_body').append(obj)
 			/*
 			$.each(function(index, el) {
@@ -81,4 +95,20 @@ $('document').ready(function() {
 			console.log(page)
 		}
 	});
+
+	$(document).on('click','#payment', function(event) {
+		//event.preventDefault();
+		var result_que = confirm('Вы уверенны?')
+		var url = $('#table').data('ajax_url')
+		var val = this['value']
+		if (result_que){
+			var result = $(this).prop('checked');
+			$.post(url,{'id':val,'status':result}, function(data){});
+		}
+		else {
+			event.preventDefault();
+		}
+	});
+
+	
 })

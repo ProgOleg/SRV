@@ -19,6 +19,14 @@ $('document').ready(function() {
 		});
 	}
 
+	$('#role').change(function(event) {
+		console.log($(this).val())
+		var value = $(this).val()
+		var obj = $('#discount')
+		if (value == 'MA') { obj.val(25) }
+		else if (value == 'CL') { }
+	});
+
 
 	exchange_rates()
 
@@ -39,6 +47,9 @@ $('document').ready(function() {
 				tell_input.addClass('is-valid');
 			}
 			else{
+				$('div.invalid-feedback').remove();
+				tell_input.removeClass('is-invalid');
+				tell_input.addClass('is-valid');
 				data = data['0'];
 				var last_name = data['last_name'];
 				var first_name = data['first_name'];
@@ -46,6 +57,8 @@ $('document').ready(function() {
 				var tell = data['tell'];
 				var addres = data['addres'];
 				var email = data['email'];
+				var role = data['role'];
+				var discount = data['discount'];
 				var result = confirm(`Клиент с таким номером телефона уже создан, использовать эти данные?\nФамилия: ${last_name}\nИмя: ${first_name} \nОтчество: ${patronymic_name}\nАдрес: ${addres} \nТелефон: ${tell}`);
 				if (result === true){
 					$('input[name="last_name"]').val(last_name);
@@ -54,6 +67,9 @@ $('document').ready(function() {
 					tell_input.val(tell);
 					$('input[name="addres"]').val(addres);
 					$('input[name="email"]').val(email);
+					$('select[name="role"]').val(role);	
+					$('input[name="discount"]').val(discount);
+
 				}
 			};
 		});

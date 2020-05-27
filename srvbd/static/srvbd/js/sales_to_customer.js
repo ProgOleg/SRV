@@ -1,5 +1,8 @@
 jQuery(document).ready(function($) {
 
+	//ЖЕСТКО КОДИРОВАНЫЙ URL
+	var url_incoming = '/incoming_list/'
+
 	function set_option_atribut(data){
 		//data - селектора поля инпут возврщенный событием
 		//апендит datalist по 'name' attr(data)
@@ -78,12 +81,24 @@ jQuery(document).ready(function($) {
 		var data = $(this).serializeArray()
 		var url = this.action
 		$.get(url,data, function(data) {
+			console.log(data)
 			$('#filter_table_body').empty()
 			$('#filter_table').removeClass('remoove')
 			$.each(data,function(index, el) {
 				var obj = $('<tr>')
-				$.each(this,function(index, el) {
-					if (index !== 'id'){obj.append($('<td>').text(el))}
+				$.each(this,function(i, elem) {
+					var foo = $('<td>')
+					if (i == 'id') {}
+						else if (i == 'attach_for_incoming__id') {}
+						else if (i == 'date_and_exch') {
+							foo.append($(`<a href=${url_incoming + data[index]['attach_for_incoming__id']} >${elem}</a>`))
+							obj.append(foo)
+						}
+						else {
+							foo.text(elem)
+							obj.append(foo)
+						}
+						
 				});
 				knob = $('<button>').attr({'type':'button','class':'btn btn-outline-info',
 						'id':'but_add','value':data[index]['id']}).text('Добавить');
@@ -138,10 +153,18 @@ jQuery(document).ready(function($) {
 		var url = $('div.container').data('index-url')
 		$.post(url,{'payment_status': payment_status},function(data,statusText) {
 			console.log(data)
+			console.log(statusText)
 			if (statusText === 'success' && data){
 				if ('quant_val_error' in data){
 					$(`#${data['quant_val_error']}`).addClass('error')
 					alert('Количесвто одной из продаваемых запчастей привышает фактическое кол-во на складе!')
+				}
+				else if ('url' in data) {
+					var url = data['url']
+					$(location).attr('href',url);
+				}
+				else if ('error_status' in data) {
+					alert(data['error_status'])
 				}
 				else {
 					$('<tr>').removeClass('error')
