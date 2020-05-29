@@ -11,6 +11,9 @@ urlpatterns = [
     path('create_person/', views.person_create, name = 'create_persons_url'),
     #__Справочники__
     path('add_part/',views.spar_part_add,name='add_part_url'),
+    path('ajax_add_specification',views.ajax_add_specification,name='add_specification'),
+    #path('ajax_add_attachment_appliances'),
+    #path('ajax_add_manufacturer'),
     #
     path('spare_parts_manual/', views.spare_parts_manual, name= 'spare_parts_manual_list'),
     #Поставщики

@@ -1,6 +1,139 @@
 {% extends 'srvbd/base.html' %}
 {% load static %}
 {% block content %}
+    <script type="text/javascript" src="{% static 'srvbd/js/part_add.js' %}"></script>
+    <div id="url_specification" data-ajax_url="{% url 'add_specification' %}"></div>
+    <div class="container mt-2">
+        <div class="row">
+            <h3>Cправочник:</h3>
+        </div>
+        <hr>
+        <div class="row">
+            <h4>Добавление запчасти:</h2>
+        </div>
+        <form action="{% url 'add_part_url' %}" method="post">
+            {% csrf_token %}
+            <div class="form-row">
+                <div class="col-md-6">
+                    <label for="name">Наименование:</label>
+                    {{form_add_part.name}}
+                    {% if form_add_part.name.errors %}
+                        <div class="invalid-feedback">{{ form_add_part.name.errors}}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label for="part_num">Парт-номер произвоидетеля:</label>
+                    {{form_add_part.part_num}}
+                    {% if form_add_part.part_num.errors %}
+                        <div class="invalid-feedback">{{ form_add_part.part_num.errors}}</div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-md-4">
+                    <button type="button" data-toggle="modal" data-target="#type_spar_part_modal" class="btn btn-outline-primary btn-xs"><span class="fa fa-plus"></button>
+                    <label for="select_type_sparpart">Выберите тип запчасти:</label>
+                    {{specification_filter.attachment_part}}
+                    {% if specification_filter.attachment_part.errors %}
+                        <div class="invalid-feedback">{{ specification_filter.attachment_part.errors}}</div>
+                    {% endif %}
+                    <datalist id="attachment_part"></datalist>
+                </div>
+                <div class="col-md-4">
+                    <button type="button"data-toggle="modal" data-target="#type_appliances_modal" class="btn btn-outline-primary btn-xs"><span class="fa fa-plus"></button>
+                    <label for="select_applience">Выберите тип устройства:</label>
+                    {{specification_filter.attachment_appliances}}
+                    {% if specification_filter.attachment_appliances.errors %}
+                        <div class="invalid-feedback">{{ specification_filter.attachment_appliances.errors}}</div>
+                    {% endif %}
+                    <datalist id="attachment_appliances"></datalist>
+                </div>
+                <div class="col-md-4">
+                    <button type="button" data-toggle="modal" data-target="#attachment_manufacturer_modal" class="btn btn-outline-primary btn-xs"><span class="fa fa-plus"></button>
+                    <label for="select_manufacturer">Выберите производителя:</label>
+                    {{specification_filter.attachment_manufacturer}}
+                    {% if specification_filter.attachment_manufacturer.errors %}
+                        <div class="invalid-feedback">{{ specification_filter.attachment_manufacturer.errors}}</div>
+                    {% endif %}
+                    <datalist id="attachment_manufacturer"></datalist>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="col-md">
+                    <label>Описание:</label>
+                    {{ form_add_part.specification }}
+                    {% if form_add_part.specification.errors %}
+                        <div class="invalid-feedback">{{ form_add_part.specification.errors}}</div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="row justify-content-end">
+                <div class="col-md-1 col-md-offset-4 mt-4">
+                    <button id="part_add_button" class="btn btn-success" type="submit" >Добавить</button>
+                </div>
+            </div>
+        </form>
+        
+        <div class="modal fade" id="type_spar_part_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Добавить тип запчасти:</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                {{ form_add_attachment_part.type_spar_part }}
+              </div>
+              <div class="modal-footer">
+                <button type="button" id="close_type_spar_part" class="btn btn-danger"  data-dismiss="modal">Отмена</button>
+                <button type="button" id="save_type_spar_part"  class="btn btn-success">Сохранить</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal fade" id="type_appliances_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" >
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Добавить вид техники:</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                {{ form_add_attachment_appliances.type_appliances }}
+              </div>
+              <div class="modal-footer">
+                <button type="button" id="close_type_appliances" class="btn btn-danger" data-dismiss="modal">Отмена</button>
+                <button type="button" id="save_type_appliances" class="btn btn-success">Сохранить</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal fade" id="attachment_manufacturer_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Добавить произвоидетеля:</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                {{ form_add_manufacturer.manufacturer }}
+              </div>
+              <div class="modal-footer">
+                <button type="button" id="close_manufacturer" class="btn btn-danger" data-dismiss="modal">Отмена</button>
+                <button type="button" id="save_manufacturer" class="btn btn-success">Сохранить</button>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+
+<!--
   <div class = "container" id = "mar_top">
     <h2>Добавление запчасти в справочник:</h2>
     <form action="{% url 'add_part_url' %}" method="post">
@@ -54,4 +187,5 @@
       <button tupe="submit" class="btn btn-success" name = "but_4">Добавить</button>
     </form>
   </div>
+  -->
 {% endblock %}

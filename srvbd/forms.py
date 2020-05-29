@@ -106,8 +106,9 @@ class AddPart(forms.ModelForm):
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите наименование',
                                            'name': 'bvz'}),
-            'specification': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Введите описание'}),
-            'part_num': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите наименование',
+            'specification': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Введите описание',
+                                                   'rows':'4'}),
+            'part_num': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите партномер',
                                                'name': 'bvz'}),
             'attachment_part': forms.Select(attrs={'class': 'form-control'}),
             'attachment_appliances': forms.Select(attrs={'class': 'form-control'}),
@@ -123,7 +124,7 @@ class AddTypeSparPart(forms.ModelForm):
 
         widgets = {
             'type_spar_part': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите наименование',
-                                                     'name': 'bvz'})
+                                                     'name': 'type_spar_part'})
         }
 
 #***__Добавление типа устройства__***
@@ -134,7 +135,7 @@ class AddTypeAppliances(forms.ModelForm):
 
         widgets = {
             'type_appliances': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите наименование',
-                                                      'name': 'bvz'})
+                                                      'name': 'type_appliances'})
         }
 
 
@@ -146,7 +147,7 @@ class AddManufacturer(forms.ModelForm):
 
 
         widgets = {'manufacturer': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите наименование',
-                                                          'name': 'bvz'})
+                                                          'name': 'manufacturer'})
         }
 
 

@@ -2,9 +2,6 @@
 {% load static %}
 {% block content %}
 	<script type="text/javascript" src="{% static 'srvbd/js/edit_incoming.js' %}"></script>
-	<div id="" data-ajax_url=""></div>
-	<div id="" data-ajax_url=""></div>
-	<div id="" data-ajax_url=""></div>
 	<div class="container">
 		{% if incom %}
 			<div class="row">
@@ -21,7 +18,7 @@
 					<dd class="col-sm-9">{{incom.exchange_rates__exchange_rates}}</dd>
 					<dt class="col-sm-3">Поставщик:</dt>
 					<dd class="col-sm-9">{{incom.full_name}}</dd>
-				</dl>
+			</dl>
 			<hr>
 			<div class="row">
 				<h4>Фильтр</h4>

@@ -73,7 +73,8 @@ def person_create(request):
 @login_required
 def spar_part_add(request):
     context = {
-        'form': AddPart(),
+        'form_add_part': AddPart(),
+        'specification_filter' : IncomInfoShipper(),
         'form_add_attachment_part': AddTypeSparPart(),
         'form_add_attachment_appliances': AddTypeAppliances(),
         'form_add_manufacturer': AddManufacturer(),
@@ -83,63 +84,52 @@ def spar_part_add(request):
         return render(request, 'srvbd/part_add.html', context)
 
     elif request.method =='POST':
-        if 'but_1' in request.POST:
-            form = AddPart(request.POST)
-            new_context = {
-                'form': form,
-                'form_add_attachment_part': AddTypeSparPart(),
-                'form_add_attachment_appliances': AddTypeAppliances(),
-                'form_add_manufacturer': AddManufacturer(),
-            }
-            if form.is_valid():
-                new_form = form.save()
-                return render(request, 'srvbd/part_add.html', context)
-            else:
-                return render(request, 'srvbd/part_add.html', new_context)
-
-        if 'but_2' in request.POST:
-            form = AddTypeSparPart(request.POST)
-            new_context = {
-                'form': AddPart(),
-                'form_add_attachment_part': AddTypeSparPart(request.POST),
-                'form_add_attachment_appliances': AddTypeAppliances(),
-                'form_add_manufacturer': AddManufacturer(),
-            }
-            if form.is_valid():
-                new_form = form.save()
-                return render(request, 'srvbd/part_add.html', context)
-            else:
-                return render(request, 'srvbd/part_add.html', new_context)
-
-        if 'but_3' in request.POST:
-            form = AddTypeAppliances(request.POST)
-            new_context = {
-                'form': AddPart(),
-                'form_add_attachment_part': AddTypeSparPart(),
-                'form_add_attachment_appliances': AddTypeAppliances(request.POST),
-                'form_add_manufacturer': AddManufacturer(),
-            }
-            if form.is_valid():
-                new_form = form.save()
-                return render(request, 'srvbd/part_add.html', context)
-            else:
-                return render(request, 'srvbd/part_add.html', new_context)
-
-        if 'but_4' in request.POST:
-            form = AddManufacturer(request.POST)
-            new_context = {
-                'form': AddPart(),
-                'form_add_attachment_part': AddTypeSparPart(),
-                'form_add_attachment_appliances': AddTypeAppliances(),
-                'form_add_manufacturer': AddManufacturer(request.POST),
-            }
-            if form.is_valid():
-                new_form = form.save()
-                return render(request, 'srvbd/part_add.html', context)
-            else:
-                return render(request, 'srvbd/part_add.html', new_context)
+        values = {'attachment_part':['type_spar_part',TypeSparPart],'attachment_appliances':['type_appliances',TypeAppliances],
+                  'attachment_manufacturer':['manufacturer',Manufacturer]}
+        data = dict(request.POST)
+        for item in values.keys():
+            val = data.get(item)[0]
+            foo = values.get(item)
+            mod = foo[1]
+            field = foo[0]
+            filt = {foo[0]:val}
+            obj = mod.objects.filter(**filt).values('id')
+            if obj:
+                data.update({item:obj[0].get('id')})
+            else:data.update({item:None})
+        new_data = data.copy()
+        for elem in data.keys():
+            val = data.get(elem)
+            if isinstance(val,list):
+                new_data.update({elem:val[0]})
+        form = AddPart(new_data)
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('add_part_url'))
+        else:
+            context.update({'form_add_part': form})
+            return render(request, 'srvbd/part_add.html', context)
 
     else: return HttpResponse(status=404)
+
+
+@login_required
+def ajax_add_specification(request):
+    if request.is_ajax() and request.method == 'POST':
+        data = request.POST
+        values ={'type_spar_part': AddTypeSparPart ,'type_appliances': AddTypeAppliances,
+                 'manufacturer': AddManufacturer}
+        for elem in values.keys():
+            if data.get(elem):
+                form = values.get(elem)
+                form = form(request.POST)
+                if form.is_valid():
+                    form.save()
+                    return HttpResponse(status=200)
+                else:
+                    return HttpResponse(status=403)
+    return HttpResponse(status=404)
+
 
 @login_required
 def spare_parts_manual(request):
