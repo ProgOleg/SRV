@@ -22,7 +22,7 @@ from django.db.models import *
 #Выборкадля рендеринка <datalist>
 def data_list_select_type_sparpart(request):
     if request.method=='GET' and request.is_ajax():
-        data = request.GET['val']
+        data = request.GET.get('val')
         if data:
             try:
                 obj = list(TypeSparPart.objects.filter(type_spar_part__istartswith=data)[:100].values_list('type_spar_part'))
@@ -37,7 +37,7 @@ def data_list_select_type_sparpart(request):
 # Выборкадля рендеринка <datalist>
 def data_list_select_manufacturer(request):
     if request.method=='GET' and request.is_ajax():
-        data = request.GET['val']
+        data = request.GET.get('val')
         if data:
             try:
                 obj = list(Manufacturer.objects.filter(manufacturer__istartswith=data).values_list('manufacturer'))
@@ -52,7 +52,7 @@ def data_list_select_manufacturer(request):
 #Выборка по "Тип устройства(select_applience)" для рендеринка <datalist>
 def data_list_select_appliances(request):
     if request.method =='GET' and request.is_ajax():
-        data = request.GET['val']
+        data = request.GET.get('val')
         if data:
             try:
                 obj = list(TypeAppliances.objects.filter(type_appliances__istartswith=data)[:100].values_list('type_appliances'))

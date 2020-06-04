@@ -12,8 +12,6 @@ urlpatterns = [
     #__Справочники__
     path('add_part/',views.spar_part_add,name='add_part_url'),
     path('ajax_add_specification',views.ajax_add_specification,name='add_specification'),
-    #path('ajax_add_attachment_appliances'),
-    #path('ajax_add_manufacturer'),
     #
     path('spare_parts_manual/', views.spare_parts_manual, name= 'spare_parts_manual_list'),
     #Поставщики
@@ -23,7 +21,6 @@ urlpatterns = [
     path('add_device/',views.AddDevice.as_view(),name="add_device_url"),
     path('ajax_add_part_set_list/',views.tools_ajax_add_part_set_list,name='ajax_add_part_set_list_url'),
     #
-
     path('incoming_list/<int:incom_id>/', views.IncomingListDetail.as_view(), name='incom_list_detail_url'),
     path('incoming_list/',views.IncomingList.as_view(),name='incom_list_url'),
     #

@@ -84,31 +84,39 @@ def spar_part_add(request):
         return render(request, 'srvbd/part_add.html', context)
 
     elif request.method =='POST':
+
+        def return_invalid_feedback(request,form_add_part,specification_filter):
+            context['form_add_part'] = form_add_part
+            context['specification_filter'] = specification_filter
+            return render(request, 'srvbd/part_add.html', context)
         values = {'attachment_part':['type_spar_part',TypeSparPart],'attachment_appliances':['type_appliances',TypeAppliances],
                   'attachment_manufacturer':['manufacturer',Manufacturer]}
-        data = dict(request.POST)
-        for item in values.keys():
-            val = data.get(item)[0]
-            foo = values.get(item)
-            mod = foo[1]
-            field = foo[0]
-            filt = {foo[0]:val}
-            obj = mod.objects.filter(**filt).values('id')
-            if obj:
-                data.update({item:obj[0].get('id')})
-            else:data.update({item:None})
-        new_data = data.copy()
-        for elem in data.keys():
-            val = data.get(elem)
-            if isinstance(val,list):
-                new_data.update({elem:val[0]})
-        form = AddPart(new_data)
-        if form.is_valid():
-            form.save()
-            return redirect(reverse('add_part_url'))
+        data = request.POST
+        form_add_part = AddPart(data)
+        specification_filter = IncomInfoShipper(data)
+        if form_add_part.is_valid():
+            form_add_part_cleaned_data = form_add_part.cleaned_data
         else:
-            context.update({'form_add_part': form})
-            return render(request, 'srvbd/part_add.html', context)
+            return return_invalid_feedback(request,form_add_part,specification_filter)
+        if specification_filter.is_valid():
+            specification_filter_cleaned_data = specification_filter.cleaned_data
+        else:
+            return return_invalid_feedback(request, form_add_part, specification_filter)
+        data_to_create = {}
+        for item in values.keys():
+            mod_name = values[item][1]
+            field_name = values[item][0]
+            val = specification_filter_cleaned_data.get(item)
+            obj = mod_name.objects.filter(**{field_name:val}).values('id')
+            if obj.exists():
+                pk = obj[0].get('id')
+                data_to_create.update({item + '_id': pk})
+            else:
+                specification_filter.add_error(field=item,error='Такая спецификация не создана')
+                return return_invalid_feedback(request, form_add_part, specification_filter)
+        data_to_create = {**data_to_create,**form_add_part_cleaned_data}
+        SparPart.objects.create(**data_to_create)
+        return render(request, 'srvbd/part_add.html', context)
 
     else: return HttpResponse(status=404)
 
@@ -123,11 +131,13 @@ def ajax_add_specification(request):
             if data.get(elem):
                 form = values.get(elem)
                 form = form(request.POST)
+                #import pdb
+                #pdb.set_trace()
                 if form.is_valid():
                     form.save()
-                    return HttpResponse(status=200)
+                    return JsonResponse({'success':'True'})
                 else:
-                    return HttpResponse(status=403)
+                    return JsonResponse({'success':'False','error_message':form.errors})
     return HttpResponse(status=404)
 
 
@@ -142,14 +152,18 @@ def spare_parts_manual(request):
 
 @login_required
 def shipper_create(request):
+    context = {'ship_create':ShipperCreate()}
     if request.method == "GET":
-        return render(request,'srvbd/shipper_create.html',{'ship_create':ShipperCreate()})
+        return render(request,'srvbd/shipper_create.html',context)
     if request.method == "POST":
         data = ShipperCreate(request.POST)
         if data.is_valid():
-            new_data = data.save()
-            return render(request, 'srvbd/shipper_create.html', {'ship_create': ShipperCreate()})
-        else: return render(request,'srvbd/shipper_create.html',{'ship_create':ShipperCreate(request.POST)})
+            data.save()
+            return render(request, 'srvbd/shipper_create.html', context)
+        else:
+            context['ship_create'] = data
+            return render(request,'srvbd/shipper_create.html',context)
+
 
 
 @login_required
@@ -347,7 +361,7 @@ def tools_ajax_create_incom_filter(request):
             if isinstance(element,list):
                 element = element[0]
             if len(element) == 0: filtered_data.pop(item)
-        response_data = SparPart.objects.filter(**filtered_data)[:20].values('id', 'name', 'part_num', 'specification', 'attachment_part__type_spar_part',
+        response_data = SparPart.objects.filter(**filtered_data)[:30].values('id', 'name', 'part_num', 'specification', 'attachment_part__type_spar_part',
                                            'attachment_appliances__type_appliances','attachment_manufacturer__manufacturer')
 
         return JsonResponse(list(response_data),safe=False)
@@ -514,7 +528,7 @@ class SalesToCustomer(LoginRequiredMixin, View):
                 'detail_attach__detail_name__name', 'detail_attach__detail_name__part_num',
                 'detail_attach__detail_name__specification',
                 'quantity', 'detail_attach__incoming_price','sale_price', 'id',)
-            if obj:
+            if obj.exists():
                 return JsonResponse(list(obj),safe=False)
             else: return HttpResponse(status=200)
         else:
@@ -831,7 +845,7 @@ class PartsReturn(LoginRequiredMixin, View):
                     value = float(el.get('value'))
                     obj = MaterialSaleObject.objects.filter(pk=pk,person_invoice_attach=invoice_id).values(
                         'quantity','detail_attach__quantity')
-                    if obj:
+                    if obj.exists():
                         mat_quantity = obj[0]['quantity']
                         det_quantity = obj[0]['detail_attach__quantity']
                         quantity_update = mat_quantity - value

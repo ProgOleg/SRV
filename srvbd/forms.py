@@ -101,7 +101,7 @@ class ShipperCreate(forms.ModelForm):
 class AddPart(forms.ModelForm):
     class Meta:
         model = SparPart
-        fields = ['name','part_num','specification','attachment_part','attachment_appliances','attachment_manufacturer',]
+        fields = ['name','part_num','specification']
 
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите наименование',
@@ -109,12 +109,10 @@ class AddPart(forms.ModelForm):
             'specification': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Введите описание',
                                                    'rows':'4'}),
             'part_num': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите партномер',
-                                               'name': 'bvz'}),
-            'attachment_part': forms.Select(attrs={'class': 'form-control'}),
-            'attachment_appliances': forms.Select(attrs={'class': 'form-control'}),
-            'attachment_manufacturer': forms.Select(attrs={'class': 'form-control'}),
-
+                                               'name': 'bvz'})
             }
+
+    
 
 #***__Добавленгие типа запчасти__***
 class AddTypeSparPart(forms.ModelForm):
@@ -127,6 +125,13 @@ class AddTypeSparPart(forms.ModelForm):
                                                      'name': 'type_spar_part'})
         }
 
+    def clean_type_spar_part(self):
+        obj = self.cleaned_data['type_spar_part']
+        obj = obj.lower().capitalize()
+
+        return obj
+
+
 #***__Добавление типа устройства__***
 class AddTypeAppliances(forms.ModelForm):
     class Meta:
@@ -137,6 +142,11 @@ class AddTypeAppliances(forms.ModelForm):
             'type_appliances': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите наименование',
                                                       'name': 'type_appliances'})
         }
+
+    def clean_type_appliances(self):
+        obj = self.cleaned_data['type_appliances']
+        obj = obj.lower().capitalize()
+        return obj
 
 
 #***__Добавление производителя__***
@@ -150,6 +160,10 @@ class AddManufacturer(forms.ModelForm):
                                                           'name': 'manufacturer'})
         }
 
+    def clean_manufacturer(self):
+        obj = self.cleaned_data['manufacturer']
+        obj = obj.lower().capitalize()
+        return obj
 
 
 #***__Создание прихода__***
