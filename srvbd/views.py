@@ -144,7 +144,7 @@ def ajax_add_specification(request):
 @login_required
 def spare_parts_manual(request):
     if request.method == 'GET':
-        parts_manual_list = SparPart.objects.order_by('-id')[:100]
+        parts_manual_list = SparPart.objects.order_by('-id')
         context = {'manual': parts_manual_list}
 
     return render(request, 'srvbd/spare_parts_manual.html',context)
