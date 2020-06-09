@@ -78,8 +78,8 @@ def lead_time(func):
 
 
 
-def tools_get_exchange_rates_USD_privat24():
-    #Возвращает курс доллара
+def tools_get_exchange_rates_EUR_privat24():
+    #Возвращает курс евро
 
     def date_for_requests(val):
         #Возвращает дату, в зависимости от входго значения (int) возвращает дат
@@ -96,10 +96,10 @@ def tools_get_exchange_rates_USD_privat24():
         return bar
 
     def get_usd_saleRate(data):
-        #достает курс USD из data
+        #достает курс (EUR) из data
         result = {}
         for el in data:
-            if el.get('currency') == 'USD':
+            if el.get('currency') == 'EUR':
                 result = el
                 break
         result = str(result.get('saleRate'))

@@ -112,7 +112,7 @@ class AddPart(forms.ModelForm):
                                                'name': 'bvz'})
             }
 
-    
+
 
 #***__Добавленгие типа запчасти__***
 class AddTypeSparPart(forms.ModelForm):
@@ -171,11 +171,12 @@ class AddManufacturer(forms.ModelForm):
 class CreateIncom(forms.ModelForm):
     class Meta:
         model = Incoming
-        fields = ['incoming_date','ship']
+        fields = ['incoming_date','ship','currency']
         widgets = {
             'incoming_date': forms.DateInput(attrs={'class':"form-control ",'id':"datepicker",
                                                     'placeholder':'Укажите дату прихода',}),
-            'ship': forms.Select(attrs={'class': 'form-control'})
+            'ship': forms.Select(attrs={'class': 'form-control'}),
+            'currency' : forms.Select(attrs={'class': 'form-control'})
         }
 
 
@@ -228,7 +229,7 @@ class ExchangeRatesForm(forms.ModelForm):
     class Meta:
         model = ExchangeRates
         fields = ['exchange_rates']
-        widgets = {'exchange_rates': forms.NumberInput(attrs={'class':'form-control','placeholder':"Укажите курс 'USD'",
+        widgets = {'exchange_rates': forms.NumberInput(attrs={'class':'form-control','placeholder':"Укажите курс 'EUR'",
                                                        'step':'0.01','value':'0.00'})}
 
     def clean_exchange_rates(self):

@@ -91,6 +91,8 @@ class Manufacturer(models.Model):
 #***__Приходы зачастей__***
 
 class Incoming(models.Model):
+    CURRENCY_CHOICES = [('UAH','UAH'),('EUR','EUR')]
+
     incoming_date = models.DateField()
     ship = models.ForeignKey('Shipper',null=True,on_delete=models.SET_NULL,
                              related_name='attash_incoming_list')
@@ -98,7 +100,7 @@ class Incoming(models.Model):
                                         related_name='incoming_exchange_rates')
 
     status = models.BooleanField(default=False)
-
+    currency = models.CharField(max_length=3,choices=CURRENCY_CHOICES,default='UAH  ')
 
     def __str__(self):
         return "{} {}".format(self.incoming_date,self.ship)

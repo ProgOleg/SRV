@@ -52,7 +52,7 @@
 					{% endif %}
 				</div>
 				<div class="col-md-2" id="exchange_rates_div" data-ajax-url="{% url 'get_usd_exchange_rates' %}">
-					<label>Курс(USD):</label>
+					<label>Курс(EUR):</label>
 					{{exchange_rates.exchange_rates}}
 					{% if exchange_rates.errors.exchange_rates %}
 						<div class="invalid-feedback">{{ exchange_rates.errors.exchange_rates }}</div>

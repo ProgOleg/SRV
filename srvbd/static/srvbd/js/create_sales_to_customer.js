@@ -6,7 +6,7 @@ $('document').ready(function() {
 	если чекнутый номер закреплен за клиентом рендерит остальные поля из бд посредством confirm
 	*/
 	function exchange_rates(){
-		//Делает запрос на курс USD по селектору exchange_rate-div и дата атрибуту data-ajax-url
+		//Делает запрос на курс (EUR) по селектору exchange_rate-div и дата атрибуту data-ajax-url
 		var url = $('#exchange_rates_div').data('ajax-url')
 		console.log(url)
 		$.get(url, function(data) {

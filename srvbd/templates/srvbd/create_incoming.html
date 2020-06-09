@@ -9,7 +9,7 @@
 			<div class ="container">
 				<div class="row">
 					<div class="col">
-						<h3>Не закрытые приходы:</h3>
+						<h3>Незакрытые приходы:</h3>
 					</div>
 				</div>
 				<br>
@@ -19,7 +19,7 @@
 		    				<th scope="col">№ Id</th>
 		    				<th scope="col">Дата</th>
 		     				<th scope="col">Поставщик</th>
-		      				<th scope="col">Курс($)</th>
+		      				<th scope="col">Курс(EUR)</th>
 		      				<th scope="col">Cумма прихода</th>
 		      				<th scope="col">Статус</th>
 		      				<th scope="col">Действие</th>
@@ -68,8 +68,12 @@
 						{{create_incom.ship}}
 					</div>	
 					<div class="col" id="exchange_rates" data-ajax-url="{% url 'get_usd_exchange_rates' %}">
-						<label>Укажите курс 'USD':</label>
+						<label>Укажите курс(EUR):</label>
 						{{exchange_rates.exchange_rates}}
+					</div>
+					<div>
+						<label>Валюта прихода:</label>
+						{{create_incom.currency}}
 					</div>
 				</div>
 				<br>

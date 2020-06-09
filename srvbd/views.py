@@ -176,7 +176,7 @@ def shippers_list(request):
 class IncomingList(LoginRequiredMixin, View):
 
     def get(self,request):
-        all_incom = Incoming.objects.all()
+        all_incom = Incoming.objects.all().order_by('-incoming_date')
         return render(request,'srvbd/incom_list.html', {'all_incoming':all_incom})
 
 
@@ -241,7 +241,7 @@ def ajax_detail_in_stock_filter(request,page):
 
         quer = Detail.objects.filter(**filtered_data).annotate(
             date_and_exch=Concat('attach_for_incoming__incoming_date', V(' '),
-                                 'attach_for_incoming__exchange_rates__exchange_rates', V('$'),
+                                 'attach_for_incoming__exchange_rates__exchange_rates', V('€'),
                                  output_field=CharField())).values(
             'detail_name__id', 'detail_name__name', 'detail_name__part_num', 'detail_name__specification',
             'detail_name__attachment_part__type_spar_part', 'detail_name__attachment_appliances__type_appliances',
@@ -319,23 +319,36 @@ class EditIncoming(LoginRequiredMixin, View):
             if Incoming.objects.filter(pk=incom_id).exists():
                 incom = Incoming.objects.filter(pk=incom_id).annotate(full_name=Concat(
                     'ship__last_name', V(' '), 'ship__first_name', V(' '),'ship__patronymic_name')).values(
-                    'incoming_date','exchange_rates__exchange_rates','full_name','id')
+                    'incoming_date','exchange_rates__exchange_rates','full_name','id','currency')
                 context.update({'incom': incom[0]})
                 return render(request, 'srvbd/edit_incoming.html', context)
             else: return HttpResponse(status=404)
 
 
     def post(self,request,incom_id):
-        Incoming.objects.filter(id=incom_id).update(status=True)
-        data = DetailInIncomList.objects.filter(selector_incom_id=incom_id)
-        for item in data:
-            obj_spart = int(item.spar_part_id)
-
-            Detail.objects.create(detail_name_id=obj_spart,incoming_price=item.incoming_price,
-                quantity=item.quantity,attach_for_incoming_id=incom_id)
-        revers_url = reverse('incom_list_detail_url',args=[incom_id])
-        return redirect(revers_url)
-
+        import pdb
+        pdb.set_trace()
+        obj_incom = Incoming.objects.filter(id=incom_id)
+        if obj_incom.exists():
+            data = DetailInIncomList.objects.filter(selector_incom_id=incom_id)
+            currency = obj_incom.values('currency')
+            currency = currency[0]['currency']
+            if currency == "EUR":
+                #Нормализация цены перевод из валюты
+                exchange_rates = obj_incom.values('exchange_rates__exchange_rates')
+                exchange_rates = float(exchange_rates[0]['exchange_rates__exchange_rates'])
+                #data.update(incoming_price=F('incoming_price')*exchange_rates,2))
+                for elem in data:
+                    elem.incoming_price = round(elem.incoming_price*exchange_rates,2)
+                    elem.save()
+            for item in data:
+                obj_spart = int(item.spar_part_id)
+                Detail.objects.create(detail_name_id=obj_spart,incoming_price=item.incoming_price,
+                    quantity=item.quantity,attach_for_incoming_id=incom_id)
+            obj_incom.update(status=True)
+            revers_url = reverse('incom_list_detail_url',args=[incom_id])
+            return redirect(revers_url)
+        else: return HttpResponse(status=404)
 
 
 @login_required
@@ -398,9 +411,9 @@ def tools_ajax_create_incom_change_detail(request,incom_id):
             val = 0
 
         if field == "quantity":
-            obj = DetailInIncomList.objects.filter(id=int(data['id'])).update(quantity=val)
+            obj = DetailInIncomList.objects.filter(pk=int(data['id'])).update(quantity=val)
         elif field == "incoming_price":
-            obj = DetailInIncomList.objects.filter(id=int(data['id'])).update(incoming_price=val)
+            obj = DetailInIncomList.objects.filter(pk=int(data['id'])).update(incoming_price=val)
         return JsonResponse(obj,safe=False)
     else: return HttpResponse(status=404)
 
@@ -632,7 +645,7 @@ def sales_to_customer_filter(request):
                       }
         obj = Detail.objects.filter(**valid_data,status_delete=False)[:50].annotate(
             date_and_exch=Concat('attach_for_incoming__incoming_date', V(' '),
-                                 'attach_for_incoming__exchange_rates__exchange_rates', V('$'),
+                                 'attach_for_incoming__exchange_rates__exchange_rates', V('€'),
                                  output_field=CharField())).values(
             'id', 'detail_name__id', 'detail_name__name', 'detail_name__part_num', 'detail_name__specification',
             'detail_name__attachment_part__type_spar_part', 'detail_name__attachment_appliances__type_appliances',
@@ -875,7 +888,7 @@ def ajax_return_parts_del_part(request):
 @login_required
 def tools_ajax_exchange_rates_usd_privat24(request):
     if request.method == 'GET' and request.is_ajax():
-        result = tools_get_exchange_rates_USD_privat24()
+        result = tools_get_exchange_rates_EUR_privat24()
         if result:
             #ExchangeRates.objects.create(exchange_rates=result)
             result = {'exchange_rates': result}

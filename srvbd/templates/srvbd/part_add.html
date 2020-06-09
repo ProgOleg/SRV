@@ -18,6 +18,9 @@
                     <label for="name">Наименование:</label>
                     {{form_add_part.name}}
                     {% if form_add_part.name.errors %}
+                        <script type="text/javascript">
+                            $('#id_name').addClass('is-invalid')
+                        </script>
                         <div class="invalid-feedback">{{ form_add_part.name.errors}}</div>
                     {% endif %}
                 </div>
@@ -25,6 +28,9 @@
                     <label for="part_num">Парт-номер произвоидетеля:</label>
                     {{form_add_part.part_num}}
                     {% if form_add_part.part_num.errors %}
+                        <script type="text/javascript">
+                            $('#id_part_num').addClass('is-invalid')
+                        </script>
                         <div class="invalid-feedback">{{ form_add_part.part_num.errors}}</div>
                     {% endif %}
                 </div>
@@ -35,6 +41,9 @@
                     <label for="select_type_sparpart">Выберите тип запчасти:</label>
                     {{specification_filter.attachment_part}}
                     {% if specification_filter.attachment_part.errors %}
+                        <script type="text/javascript">
+                            $('#id_attachment_part').addClass('is-invalid')
+                        </script>
                         <div class="invalid-feedback">{{ specification_filter.attachment_part.errors}}</div>
                     {% endif %}
                     <datalist id="attachment_part"></datalist>
@@ -44,6 +53,9 @@
                     <label for="select_applience">Выберите тип устройства:</label>
                     {{specification_filter.attachment_appliances}}
                     {% if specification_filter.attachment_appliances.errors %}
+                        <script type="text/javascript">
+                            $('#id_attachment_appliances').addClass('is-invalid')
+                        </script>
                         <div class="invalid-feedback">{{ specification_filter.attachment_appliances.errors}}</div>
                     {% endif %}
                     <datalist id="attachment_appliances"></datalist>
@@ -53,6 +65,9 @@
                     <label for="select_manufacturer">Выберите производителя:</label>
                     {{specification_filter.attachment_manufacturer}}
                     {% if specification_filter.attachment_manufacturer.errors %}
+                        <script type="text/javascript">
+                            $('#id_attachment_manufacturer').addClass('is-invalid')
+                        </script>
                         <div class="invalid-feedback">{{ specification_filter.attachment_manufacturer.errors}}</div>
                     {% endif %}
                     <datalist id="attachment_manufacturer"></datalist>
@@ -63,6 +78,9 @@
                     <label>Описание:</label>
                     {{ form_add_part.specification }}
                     {% if form_add_part.specification.errors %}
+                        <script type="text/javascript">
+                            $('#id_specification').addClass('is-invalid')
+                        </script>
                         <div class="invalid-feedback">{{ form_add_part.specification.errors}}</div>
                     {% endif %}
                 </div>
