@@ -48,7 +48,8 @@ $('document').ready(function(){
 	function new_detail_table(ind,data){
 		var url = filter_url + ind + '/'
 		$.get(url,data, function(data) {
-			render(data)
+			render(data['obects'])
+			$('#count_obj').text(`Найденно ${data['count_obj']} объектов`)
 		}).fail(function(){
 			return null
 		})
@@ -59,7 +60,7 @@ $('document').ready(function(){
 		if ($(window).scrollTop() + $(window).height() >= $(document).height()){
 			page += 1
 			new_detail_table(page,data)
-			console.log(page)
+
 		}
 	});
 

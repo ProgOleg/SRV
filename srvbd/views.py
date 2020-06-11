@@ -238,7 +238,7 @@ def ajax_detail_in_stock_filter(request,page):
             filtered_data.update({'status_delete':False})
         else:
             filtered_data = {'status_delete':False}
-
+        count_quer = Detail.objects.filter(**filtered_data).count()
         quer = Detail.objects.filter(**filtered_data).annotate(
             date_and_exch=Concat('attach_for_incoming__incoming_date', V(' '),
                                  'attach_for_incoming__exchange_rates__exchange_rates', V('€'),
@@ -258,8 +258,13 @@ def ajax_detail_in_stock_filter(request,page):
                               'detail_name__attachment_appliances__type_appliances '
                               'detail_name__attachment_manufacturer__manufacturer'
                               ' date_and_exch quantity incoming_price attach_for_incoming__id')
+
         new_obj = [Template(**i)._asdict() for i in obj]
-        return JsonResponse(new_obj, safe=False)
+        #import pdb
+        #pdb.set_trace()
+        data_ret = {'obects':new_obj,'count_obj': count_quer}
+
+        return JsonResponse(data_ret, safe=False)
     else: return HttpResponse(status=404)
 
 
@@ -273,9 +278,9 @@ def ajax_detail_in_stock_filter(request,page):
 
 
 class CreateIncoming(LoginRequiredMixin, View):
-
+    incming_stat_false = Incoming.objects.filter(status=False)
     context = {
-        'incming_stat_false': Incoming.objects.filter(status = False),
+        'incming_stat_false': incming_stat_false,
         'create_incom': CreateIncom(),
         'exchange_rates': ExchangeRatesForm(),
     }
@@ -326,8 +331,8 @@ class EditIncoming(LoginRequiredMixin, View):
 
 
     def post(self,request,incom_id):
-        import pdb
-        pdb.set_trace()
+        #import pdb
+        #pdb.set_trace()
         obj_incom = Incoming.objects.filter(id=incom_id)
         if obj_incom.exists():
             data = DetailInIncomList.objects.filter(selector_incom_id=incom_id)
