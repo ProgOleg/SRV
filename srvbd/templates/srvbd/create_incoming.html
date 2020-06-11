@@ -29,7 +29,7 @@
 		    				{% for Incom in incming_stat_false %}
 		    			<tr>
 		  				  <th scope="row">{{Incom.id}}</th>
-		  				  <td><a href="/incoming_list/get_{{Incom.id}}/">{{Incom.incoming_date}}</a></td>
+		  				  <td><a href="{% url 'incom_list_detail_url' Incom.id %}">{{Incom.incoming_date}}</a></td>
 		  				  <td>{{Incom.ship}}</td>
 		  				  <td>{{Incom.exchange_rates}}</td>
 		  				  <td></td>
