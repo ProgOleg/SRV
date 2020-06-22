@@ -535,12 +535,14 @@ class SalesToCustomer(LoginRequiredMixin, View):
 
     def get(self,request,invoice_id):
 
-        try:
-            obj = SalesPersonInvoice.objects.get(pk=invoice_id)
-        except ObjectDoesNotExist:
+        obj = SalesPersonInvoice.objects.filter(pk=invoice_id).values(
+            'exchange_rates__exchange_rates','person_attach__id','status','person_attach__discount',
+            'person_attach__tell','payment_state')
+
+        if not obj.exists() or obj[0]['status'] == True:
             return HttpResponse(status=404)
-        if obj.status:
-            return HttpResponse(status=404)
+        person = Person.objects.get(pk=obj[0]['person_attach__id']).fulll_name
+
         if request.is_ajax():
             obj = MaterialSaleObject.objects.filter(person_invoice_attach=invoice_id).values(
                 'detail_attach__detail_name__name', 'detail_attach__detail_name__part_num',
@@ -552,10 +554,11 @@ class SalesToCustomer(LoginRequiredMixin, View):
         else:
             context = {
                 'invoice_id': invoice_id,
-                'person': obj.person_attach,
+                'person': person,
+                'info': obj[0],
                 'specification_filter': IncomInfoShipper(),
                 'detail_filter': FilterDetail(),
-                'payment_state':obj.payment_state
+                'payment_state':obj[0]['payment_state']
             }
             return render(request,'srvbd/sales_to_customer.html',context)
 
@@ -606,6 +609,61 @@ class SalesToCustomer(LoginRequiredMixin, View):
 
 @login_required
 def sales_to_customer_filter(request):
+    '''
+        if request.is_ajax() and request.method == 'GET':
+        data = dict(request.GET)
+        if data:
+            set_field_name = {
+                'name':'detail_name__name__icontains','specification':'detail_name__specification__icontains',
+                'part_num':'detail_name__part_num__icontains','attachment_part': 'detail_name__attachment_part__type_spar_part',
+                'attachment_appliances': 'detail_name__attachment_appliances__type_appliances',
+                'attachment_manufacturer': 'detail_name__attachment_manufacturer__manufacturer'}
+            for item in set_field_name:
+                el = data.pop(item, None)
+                if el != None:
+                    data.update({set_field_name.get(item): el[0]})
+                else:
+                    return HttpResponse(status=400)
+            filtered_data = data.copy()
+            for item in data:
+                element = data.get(item)
+                if isinstance(element, list):
+                    element = element[0]
+                if len(element) == 0:
+                    filtered_data.pop(item)
+            filtered_data.update({'status_delete':False})
+        else:
+            filtered_data = {'status_delete':False}
+        count_quer = Detail.objects.filter(**filtered_data).count()
+        quer = Detail.objects.filter(**filtered_data).annotate(
+            date_and_exch=Concat('attach_for_incoming__incoming_date', V(' '),
+                                 'attach_for_incoming__exchange_rates__exchange_rates', V('€'),
+                                 output_field=CharField())).values(
+            'detail_name__id', 'detail_name__name', 'detail_name__part_num', 'detail_name__specification',
+            'detail_name__attachment_part__type_spar_part', 'detail_name__attachment_appliances__type_appliances',
+            'detail_name__attachment_manufacturer__manufacturer', 'incoming_price', 'date_and_exch', 'quantity',
+            'attach_for_incoming__id')
+        obj = Paginator(quer, 5)
+        try:
+            obj = obj.page(page)
+        except InvalidPage:
+            return HttpResponse(status=404)
+        Template = namedtuple(
+            'Detai_in_stock', 'detail_name__id detail_name__name detail_name__part_num detail_name__specification '
+                              'detail_name__attachment_part__type_spar_part '
+                              'detail_name__attachment_appliances__type_appliances '
+                              'detail_name__attachment_manufacturer__manufacturer'
+                              ' date_and_exch quantity incoming_price attach_for_incoming__id')
+
+        new_obj = [Template(**i)._asdict() for i in obj]
+        #import pdb
+        #pdb.set_trace()
+        data_ret = {'obects':new_obj,'count_obj': count_quer}
+
+        return JsonResponse(data_ret, safe=False)
+
+    '''
+
     if request.method=='GET' and request.is_ajax():
         data = request.GET
         incom_info_chiper = IncomInfoShipper(data)
@@ -679,24 +737,25 @@ def sales_to_customer_add_detail(request,invoice_id):
             return HttpResponse(status=404)
         foo = SalesPersonInvoice.objects.filter(id=invoice_id).values(
             'exchange_rates__exchange_rates','person_attach__discount')
-        exchangee_rates = float(foo[0]['exchange_rates__exchange_rates'])
+        exchange_rates = float(foo[0]['exchange_rates__exchange_rates'])
         discount = float(foo[0]['person_attach__discount'])
         discount = discount / 100
         markup = Markup.objects.last()
         markup = float(markup.markup)
-        detail_info = Detail.objects.filter(id=int(data)).values('incoming_price',
+        detail_info = Detail.objects.filter(pk=int(data)).values('incoming_price',
                                                                       'attach_for_incoming__exchange_rates__exchange_rates')
         detail_info = detail_info[0]
         incoming_price = detail_info['incoming_price']
         incoming_exchange_rates = detail_info['attach_for_incoming__exchange_rates__exchange_rates']
-        val = (incoming_price / incoming_exchange_rates) * exchangee_rates
+        val = (incoming_price / incoming_exchange_rates) * exchange_rates
         if val < incoming_price:
             val = incoming_price
         # место для наценки
-        val =  (val * markup)
-        val = val - val*discount
+        val_markup =  (val * markup)
+        val = val_markup - val*discount
         val = round(val,0)
-        obj = MaterialSaleObject.objects.create(detail_attach_id=int(data), person_invoice_attach_id=invoice_id,sale_price=val)
+        obj = MaterialSaleObject.objects.create(detail_attach_id=int(data), person_invoice_attach_id=invoice_id,
+                                                sale_price=val,quantity=1)
         obj = MaterialSaleObject.objects.filter(id = obj.id).values(
                 'detail_attach__detail_name__name', 'detail_attach__detail_name__part_num',
                 'detail_attach__detail_name__specification',

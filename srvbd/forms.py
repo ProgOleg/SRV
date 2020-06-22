@@ -22,7 +22,7 @@ class PersonCreate(forms.ModelForm):
             'addres': forms.TextInput(attrs={'class': 'form-control','placeholder':'Введите адрес'}),
             'email': forms.TextInput(attrs={'class': 'form-control','placeholder':'Введите email'}),
             'role' : forms.Select(attrs={'class': 'form-control','id':'role'}),
-            'discount' : forms.NumberInput(attrs={'class': 'form-control','id':'discount'})
+            'discount' : forms.NumberInput(attrs={'class': 'form-control','id':'discount','max': 100,'min': 0})
         }
 
 
@@ -60,6 +60,12 @@ class PersonCreate(forms.ModelForm):
         c = self.cleaned_data['patronymic_name']
         c = c.lower().capitalize()
         return c
+
+    def clean_discount(self):
+        discount = self.cleaned_data['discount']
+        if discount > 100 or discount < 0:
+            raise ValidationError('Не больше 100, не меньше 0!')
+        return discount
 
 #***__Добавление поставщика__***
 class ShipperCreate(forms.ModelForm):

@@ -26,12 +26,12 @@ class Person(models.Model):
 
 
     def __str__(self):
-        return "{} {}.{}, {}".format(self.last_name, self.first_name[0],self.patronymic_name[0],self.person_role)
+        return "{} {}.{}, {}".format(self.last_name, self.first_name[0],self.patronymic_name[0],self.role)
 
     @property
     def fulll_name(self):
         "Returns the person's full name."
-        return '%s %s' % (self.first_name, self.last_name)
+        return '{} {}.{}'.format(self.last_name,self.first_name[0],self.patronymic_name[0])
 
 
 class Markup(models.Model):

@@ -124,7 +124,7 @@ def materialSaleObject_check_actual_salePrice(pk,new_val):
     obj = MaterialSaleObject.objects.filter(id=pk).values('detail_attach__incoming_price',
                                                           'detail_attach__attach_for_incoming__exchange_rates__exchange_rates',
                                                           'person_invoice_attach__exchange_rates__exchange_rates')
-    if not obj:
+    if not obj.exists():
         return HttpResponse(status=404)
     incom_price = float(obj[0]['detail_attach__incoming_price'])
     incom_exchange_rates = float(obj[0]['detail_attach__attach_for_incoming__exchange_rates__exchange_rates'])

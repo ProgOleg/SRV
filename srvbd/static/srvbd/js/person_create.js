@@ -5,7 +5,7 @@ $('document').ready(function(){
 		var value = $(this).val()
 		var obj = $('#discount')
 		if (value == 'MA') { obj.val(25) }
-		else if (value == 'CL') { }
+		else if (value == 'CL') { obj.val(0) }
 	});
 
 

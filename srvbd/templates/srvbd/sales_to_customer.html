@@ -8,19 +8,17 @@
 				<div class="row">
 					<h3>Продажа запчастей клиенту</h3>
 				</div>
+				<br>
 				<hr>
-				<div class="row">
-					<h4>Покупатель:</h2>
-				</div>
 				<dl class="row">
-					<dt class="col-sm-3">Фамилия:</dt>
-					<dd class="col-sm-9">{{person.last_name}}</dd>
-					<dt class="col-sm-3">Имя:</dt>
-					<dd class="col-sm-9">{{person.first_name}}</dd>
-					<dt class="col-sm-3">Отчесвто:</dt>
-					<dd class="col-sm-9">{{person.patronymic_name}}</dd>
+					<dt class="col-sm-3">Клиент:</dt>
+					<dd class="col-sm-9">{{person}}</dd>
 					<dt class="col-sm-3">Телефон:</dt>
-					<dd class="col-sm-9">{{person.tell}}</dd>
+					<dd class="col-sm-9">{{info.person_attach__tell}}</dd>
+					<dt class="col-sm-3">Дисконт:</dt>
+					<dd class="col-sm-9">{{info.person_attach__discount}} %</dd>
+					<dt class="col-sm-3">Курс:</dt>
+					<dd class="col-sm-9">{{info.exchange_rates__exchange_rates}} € </dd>					
 				</dl>
 				<hr>
 				<div class="row">
