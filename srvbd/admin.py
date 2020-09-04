@@ -18,4 +18,5 @@ admin.site.register(DeviceUnderRepair)
 admin.site.register(Device)
 admin.site.register(SalesPersonInvoice)
 admin.site.register(ExchangeRates)
+admin.site.register(Markup)
 

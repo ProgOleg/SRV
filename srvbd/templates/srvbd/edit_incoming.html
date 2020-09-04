@@ -1,15 +1,16 @@
 {% extends 'srvbd/base.html' %}
 {% load static %}
 {% block content %}
+	<title>Приход запчастей на склад</title>
 	<script type="text/javascript" src="{% static 'srvbd/js/edit_incoming.js' %}"></script>
-	<div class="container">
+	<div class="container-fluid container-md">
 		{% if incom %}
 			<div class="row">
-				<h3>Приход запчастей на склад:</h3>
+				<h3 class="ml-1">Приход запчастей на склад:</h3>
 			</div>
 			<hr>
 			<div class="row">
-				<h4>Информация:</h2>
+				<h4 class="ml-1">Информация:</h2>
 			</div>
 			<dl class="row">
 					<dt class="col-sm-3">Дата создания:</dt>
@@ -27,7 +28,7 @@
 			</dl>
 			<hr>
 			<div class="row">
-				<h4>Фильтр</h4>
+				<h4 class="ml-1">Фильтр</h4>
 			</div>
 			<form id="filter_form" action="{% url 'ajax_create_incom_filter' %}">
 				<div class="row justify-content-between">
@@ -63,19 +64,20 @@
 	    				<datalist id="attachment_manufacturer"></datalist>
 	    			</div>
 				</div>
-				
-				<div class="row justify-content-end">
-					<div class="col-md-1 col-md-offset-4 mt-4">
+				<div class="row justify-content-end mt-3">
+					<div class="col-auto">
+			    		<button id="but_dropping" class="btn btn-danger " type="reset" >Сброс</button>
 			    		<button id="but_filter" class="btn btn-success" type="submit" >Фильтр</button>
 			    	</div>
-			    </div>	
+				</div>
+				
+					
 			</form>
 			
-			<div class="remoove row justify-content-md-center"  id="filter_table">
-				<br>
+			<div class=" table-responsive-md remoove justify-content-center mt-3"  id="filter_table">
 				<form action="{% url 'ajax_create_incom_incom_detail' incom.id %}" id="form_detail">
 					{% csrf_token %}
-					<table class="table table-striped table-bordered" >
+					<table class="table table-striped table-bordered" data-table-sm-css="" >
 			  			<thead class="thead-dark table-condensed table-bordered table-hover">
 			    			<tr>
 			     				<th scope="col">№ Id</th>
@@ -95,42 +97,47 @@
 				</form>
 			</div>
 			
-			<div class="remoove " id="detail_table" data-index-url="{% url 'edit_incoming_url' incom.id  %}">
+			<div class=" remoove mt-3" id="detail_table" data-index-url="{% url 'edit_incoming_url' incom.id  %}">
 				<div class="row">
-    				<h4>Запчасти в приходе:</h4>
+    				<h4 class="ml-1">Запчасти в приходе:</h4>
     			</div>
     			<hr>
-	    		<br>
-				<table class="table table-striped table table-bordered" >
-		  			<thead class="thead-dark table-condensed table-bordered table-hover">
-		    			<tr>
-		      				<th scope="col">Наименование</th>
-		     		 		<th scope="col">Партномер производителя</th>
-		      				<th scope="col">Описание</th>
-		      				<th scope="col">Количество</th>
-		      				{% if incom.currency == 'EUR' %}
-								<th scope="col" class="text-danger">Цена(EUR)</th>
-							{% else %}
-								<th scope="col">Цена</th>
-							{% endif %}
-		      				
-		      				<th scope="col">Действие</th>
-		    			</tr>
-		  			</thead>
-		  			<form action="{% url 'ajax_create_incom_change_detail' incom.id  %}" id="form_change_detail">
-			  			<tbody id="tbody_new_detail" data-form-action="{% url 'ajax_create_incom_delete_detail' incom.id  %}">
-				    		
-						</tbody>
-	    			</form>
-		    	</table>
+    			<div class="table-responsive-md ">
+    				<div class="justify-content-center">
+						<table class="table table-striped table table-bordered" data-table-sm-css="">
+				  			<thead class="thead-dark table-condensed table-bordered table-hover">
+				    			<tr>
+				      				<th width="15%">Наименование</th>
+				     		 		<th width="15%">Партномер производителя</th>
+				      				<th >Описание</th>
+				      				<th width="10%">Количество</th>
+				      				{% if incom.currency == 'EUR' %}
+										<th width="10%" class="text-danger">Цена(EUR)</th>
+									{% else %}
+										<th width="10%">Цена входная</th>
+									{% endif %}
+				      				
+				      				<th width="6%">Действие</th>
+				    			</tr>
+				  			</thead>
+				  			<form action="{% url 'ajax_create_incom_change_detail' incom.id  %}" id="form_change_detail">
+					  			<tbody id="tbody_new_detail" data-form-action="{% url 'ajax_create_incom_delete_detail' incom.id  %}">
+						    		
+								</tbody>
+			    			</form>
+				    	</table>
+			    	</div>
+		    	</div>
 			</div>
-			<br>
-			<div class="row justify-content-end">
-				<form action="{%url 'edit_incoming_url' incom.id %}" method="post">
-					{% csrf_token %}
-	    			<button tupe="submit" class="btn btn-success btn-lg">Сохранить</button>
-    			</form>
-			</div>
+			
+			<div class="row justify-content-end mt-3">
+	    		<div class="col-auto">
+	    			<form action="{%url 'edit_incoming_url' incom.id %}" method="post">
+						{% csrf_token %}
+	    				<button tupe="submit" class="btn btn-success btn-lg">Сохранить</button>
+    				</form>
+	    		</div>
+	    	</div>
 
 	</div>
 		{% endif %}

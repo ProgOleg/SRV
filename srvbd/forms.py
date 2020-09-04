@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.core.exceptions import ValidationError
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
-
+from .utils import *
 
 #***__Добавление клиента__***
 class PersonCreate(forms.ModelForm):
@@ -253,7 +253,35 @@ class AuthUserForm(AuthenticationForm,forms.ModelForm):
 
 
 
+class MatSaleObjChangeQuantity(forms.Form):
 
+    quantity = forms.FloatField(required=False,widget=forms.NumberInput(attrs={}))
+
+    def clean_quantity(self):
+        data = self.cleaned_data['quantity']
+        if len(str(data)) == 0:
+            raise ValidationError(('Значение не должно быть пустым'), code='invalid')
+        if data <= 0:
+            raise ValidationError(('Значение не должно быть отрицательным или 0'), code='invalid')
+        return round(data, 2)
+
+
+
+
+class MatSaleObjChangeSalePrice(forms.Form):
+
+    sale_price = forms.FloatField(required=False, widget=forms.NumberInput(attrs={}))
+
+    def clean_sale_price(self):
+
+        data = self.cleaned_data['sale_price']
+        if len(str(data)) == 0:
+            raise ValidationError(('Значение не должно быть пустым'), code='invalid')
+        if data <= 0:
+            raise ValidationError(('Значение не должно быть отрицательным или 0'), code='invalid')
+        return round(data, 2)
+
+    
 
 
 

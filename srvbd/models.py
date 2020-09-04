@@ -1,28 +1,30 @@
 from django.db import models
 from django.utils import timezone
 from django.db.models.functions import Concat
-from django.db.models import Value as V
+from django.db.models import Value as V,Q
 from django.db.models import Sum
 
 
 class Person(models.Model):
     MASTER = 'MA'
     CLIENT = 'CL'
+    OWNER = 'OW'
 
     PERSON_ROLE = [
         (MASTER,'Мастер'),
-        (CLIENT,'Клиент')
+        (CLIENT,'Клиент'),
+        (OWNER,'Собственник')
     ]
 
     first_name = models.CharField("Имя", max_length=30)
-    last_name = models.CharField("Фамилия",max_length=30)
-    patronymic_name = models.CharField("Отчество",max_length=30)
-    tell = models.CharField("Телефонный номер",max_length=13,unique = True)
-    addres = models.CharField("Адресс",max_length=200,blank=True)
-    email = models.EmailField("Почта",max_length=254,blank=True)
+    last_name = models.CharField("Фамилия", max_length=30)
+    patronymic_name = models.CharField("Отчество", max_length=30)
+    tell = models.CharField("Телефонный номер", max_length=13,unique = True)
+    addres = models.CharField("Адресс",  max_length=200,blank=True)
+    email = models.EmailField("Почта", max_length=254,blank=True)
     pub_date = models.DateTimeField(auto_now_add = True)
-    discount = models.FloatField(default=0,null=True)
-    role = models.CharField(max_length=2,choices=PERSON_ROLE,default=CLIENT)
+    discount = models.FloatField(default=0, null=True)
+    role = models.CharField(max_length=2 ,choices=PERSON_ROLE,default=CLIENT)
 
 
     def __str__(self):
@@ -38,9 +40,12 @@ class Markup(models.Model):
 
     markup = models.FloatField(default=2)
 
+    def __str__(self):
+        return "{}".format(self.markup)
 #***_Запчасти справочник_***
 
 class SparPart(models.Model):
+
     name = models.CharField("Наименование",max_length=100)
     part_num = models.CharField("Парт номер", max_length=30, unique=True, blank=True,null=True)
     specification = models.TextField("Описание",max_length=2000,blank=True,null=True)
@@ -91,13 +96,13 @@ class Manufacturer(models.Model):
 #***__Приходы зачастей__***
 
 class Incoming(models.Model):
-    CURRENCY_CHOICES = [('UAH','UAH'),('EUR','EUR')]
+    CURRENCY_CHOICES = [('UAH', 'UAH'), ('EUR', 'EUR')]
 
     incoming_date = models.DateField()
-    ship = models.ForeignKey('Shipper',null=True,on_delete=models.SET_NULL,
+    ship = models.ForeignKey('Shipper', null=True, on_delete=models.SET_NULL,
                              related_name='attash_incoming_list')
     exchange_rates = models.ForeignKey('ExchangeRates', on_delete=models.SET_NULL, null=True, default=None,
-                                        related_name='incoming_exchange_rates')
+                                       related_name='incoming_exchange_rates')
 
     status = models.BooleanField(default=False)
     currency = models.CharField(max_length=3,choices=CURRENCY_CHOICES,default='UAH  ')
@@ -117,7 +122,7 @@ class Shipper(models.Model):
 
 
     def __str__(self):
-        return "{}... {} {}.{}".format(self.specification[:20] , self.last_name,self.first_name[0],self.patronymic_name[0])
+        return "{}... {} {}.{}".format(self.specification[:20], self.last_name, self.first_name[0], self.patronymic_name[0])
 
 
 #***__Промежуточная таблица(используется только при добавлении в приход,и хранится как зч в приходе***
@@ -216,19 +221,20 @@ class VirtualSaleObject(models.Model):
 #***__Материально существующая  запчасть на складе).Объект расходного ордера!__***
 
 class MaterialSaleObject(models.Model):
-    detail_attach = models.ForeignKey("Detail", on_delete=models.SET_NULL, related_name='material_sale',null=True)
+    detail_attach = models.ForeignKey("Detail", on_delete=models.SET_NULL, related_name='material_sale', null=True)
 
-    repair_invoice_attach = models.ForeignKey("RepairInvoice", on_delete=models.SET_NULL, related_name='material_repair_invoice',
-                                              default=None,null=True)
-    person_invoice_attach = models.ForeignKey("SalesPersonInvoice", on_delete=models.SET_NULL, related_name='material_person_invoice',
-                                              default=None,null=True)
+    repair_invoice_attach = models.ForeignKey("RepairInvoice", on_delete=models.SET_NULL,
+                                              related_name='material_repair_invoice', default=None, null=True, blank=True)
+    person_invoice_attach = models.ForeignKey("SalesPersonInvoice", on_delete=models.SET_NULL,
+                                              related_name='material_person_invoice', default=None, null=True)
 
     quantity = models.FloatField(default=0,null=True)
     sale_price = models.FloatField(default=0,null=True)
+    own_margin = models.FloatField(default=1)
 
 
     def __str__(self):
-        return "{} {} {}".format(self.detail_attach,self.quantity,self.sale_price)
+        return "{} {} {}".format(self.detail_attach, self.quantity, self.sale_price)
 
 
 #***__Расходный ордер продажи запчастей клиенту__***
@@ -245,7 +251,7 @@ class SalesPersonInvoice(models.Model):
     date_of_payment = models.DateTimeField(default=None,null=True)
 
     def __str__(self):
-        return "{} {} {}".format(self.date_create,self.person_attach,self.invoice_sum)
+        return "{} {} {}".format(self.date_create, self.person_attach, self.invoice_sum)
 
 
 #***__Расходная накладная запчастей использованых в ремонте__***
@@ -267,7 +273,7 @@ class RepairInvoice(models.Model):
 class ExchangeRates(models.Model):
 
     data_create = models.DateField(auto_now_add=True)
-    exchange_rates = models.FloatField(default=0,null=True)
+    exchange_rates = models.FloatField(default=0, null=True)
     status_own_change = models.BooleanField(default=False)
 
     def __str__(self):

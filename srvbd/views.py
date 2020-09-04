@@ -1,9 +1,9 @@
-from datetime import time
+from datetime import *
 
 from django.db import transaction
-from django.shortcuts import render,redirect
-from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
-from django.template import loader
+from django.shortcuts import render, redirect
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect, FileResponse
+from django.template import loader, Context
 from django.core.paginator import Paginator
 from .models import *
 from .forms import *
@@ -13,21 +13,27 @@ from copy import deepcopy
 import re
 from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
-from datetime import *
+
 from time import sleep
 import requests
 import json
 import telepot
 import django.utils.timezone
 from django.core.paginator import *
-import datetime
+
 from collections import namedtuple
-#from . import utils
 from srvbd.utils import *
 from django.contrib.auth.views import LoginView,LogoutView
 from django.urls import reverse_lazy, reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+
+#from reportlab.pdfgen import canvas
+import io
+from io import StringIO
+from xhtml2pdf import pisa
+from django.template.loader import get_template
+from cgi import escape
 
 
 class AuthUser(LoginView):
@@ -125,8 +131,8 @@ def spar_part_add(request):
 def ajax_add_specification(request):
     if request.is_ajax() and request.method == 'POST':
         data = request.POST
-        values ={'type_spar_part': AddTypeSparPart ,'type_appliances': AddTypeAppliances,
-                 'manufacturer': AddManufacturer}
+        values = {'type_spar_part': AddTypeSparPart, 'type_appliances': AddTypeAppliances,
+                  'manufacturer': AddManufacturer}
         for elem in values.keys():
             if data.get(elem):
                 form = values.get(elem)
@@ -175,14 +181,41 @@ def shippers_list(request):
 
 class IncomingList(LoginRequiredMixin, View):
 
-    def get(self,request):
-        all_incom = Incoming.objects.all().order_by('-incoming_date')
-        return render(request,'srvbd/incom_list.html', {'all_incoming':all_incom})
+    def get(self, request):
+        #import pdb
+        #pdb.set_trace()
+        all_incom = Incoming.objects.all().order_by('-incoming_date').annotate(
+            receipt_amount=Sum(F('select_incom__incoming_price') * F('select_incom__quantity')),
+            full_name=Concat('ship__last_name', V(' '), 'ship__first_name', V(' '), 'ship__patronymic_name'))
+        #all_incom = all_incom.aggregate(receipts=Sum('receipt_amount'))
+        all_incom = all_incom.values('id', 'incoming_date', 'full_name', 'exchange_rates__exchange_rates',
+                                     'status', 'receipt_amount')
+
+        #all_incom = all_incom.values('receipts')
+
+
+        '''
+        all_incom = DetailInIncomList.objects.all().order_by('-selector_incom__incoming_date').annotate(
+            selector_incom=F('incoming_price') * F('quantity')
+        ).values('selector_incom__incoming_date', 'selector_incom__ship', 'selector_exchange_rates',
+                 'selector_incom__status', 'selector_incom__id', 'incoming_price', 'quantity')
+        
+        all_incom = Incoming.objects.all().order_by('-incoming_date').annotate(
+            selector_incom=sum(F('select_incom__incoming_price')*F('select_incom__quantity'))
+        )
+        all_incom = DetailInIncomList.objects.all().order_by('-incoming_date').annotate(
+            selector_incom=sum(F('incoming_price')*F('quantity'))
+        ).values('selector_incom__incoming_date', 'selector_incom__ship', 'selector_exchange_rates',
+                 'selector_incom__status', 'selector_incom__id', 'incoming_price', 'quantity')
+        
+        
+        '''
+        return render(request,'srvbd/incom_list.html', {'all_incoming': all_incom})
 
 
 class IncomingListDetail(LoginRequiredMixin, View):
 
-    def get(self,request,incom_id):
+    def get(self, request, incom_id):
         if Incoming.objects.filter(id=incom_id).exists():
             incom = Incoming.objects.filter(pk=incom_id).annotate(full_name=Concat(
                 'ship__last_name', V(' '), 'ship__first_name', V(' '), 'ship__patronymic_name')).values(
@@ -193,8 +226,8 @@ class IncomingListDetail(LoginRequiredMixin, View):
                     'spar_part__attachment_part__type_spar_part', 'spar_part__attachment_appliances__type_appliances',
                     'spar_part__attachment_manufacturer__manufacturer', 'incoming_price', 'quantity', 'sum')
 
-            context = {'incom': incom[0],'details': details,'equal_details':equal_details['sum__sum']}
-            return render(request,'srvbd/incom_list_detail.html',context)
+            context = {'incom': incom[0], 'details': details, 'equal_details':equal_details['sum__sum']}
+            return render(request, 'srvbd/incom_list_detail.html', context)
         else: return HttpResponse(status=404)
 
 
@@ -278,17 +311,17 @@ def ajax_detail_in_stock_filter(request,page):
 
 
 class CreateIncoming(LoginRequiredMixin, View):
-    incming_stat_false = Incoming.objects.filter(status=False)
-    context = {
-        'incming_stat_false': incming_stat_false,
-        'create_incom': CreateIncom(),
-        'exchange_rates': ExchangeRatesForm(),
-    }
 
-    def get(self,request):
-        return render(request,'srvbd/create_incoming.html',self.context)
+    def get(self, request):
+        incming_stat_false = Incoming.objects.filter(status=False)
+        context = {
+            'incming_stat_false': incming_stat_false,
+            'create_incom': CreateIncom(),
+            'exchange_rates': ExchangeRatesForm(),
+        }
+        return render(request, 'srvbd/create_incoming.html',context)
 
-    def post(self,request):
+    def post(self, request):
 
         data = request.POST
         if 'edit' in data:
@@ -503,9 +536,10 @@ class CreateSalesToCustomer(LoginRequiredMixin, View):
     }
 
     def get(self,request):
-        return render(request,'srvbd/create_sales_to_customer.html',self.context)
 
-    def post(self,request):
+        return render(request,'srvbd/create_sales_to_customer.html', self.context)
+
+    def post(self, request):
         data = request.POST
         data_exchange_rates = ExchangeRatesForm(data)
         person = PersonCreate(data)
@@ -529,11 +563,27 @@ class CreateSalesToCustomer(LoginRequiredMixin, View):
         return redirect(reverse_url)
 
 
+@login_required
+def sales_to_customer_create(request, s_invoice_pk):
+    sales_obj = SalesPersonInvoice.objects.filter(pk=s_invoice_pk).values('person_attach__pk')
+    if sales_obj.count():
+        person_pk = sales_obj[0]['person_attach__pk']
+        exchange_rates = tools_get_exchange_rates_EUR_privat24()
+        if exchange_rates:
+            person = Person.objects.get(pk=person_pk)
+            data_exchange_rates = ExchangeRates.objects.create(exchange_rates=exchange_rates)
+            foo = SalesPersonInvoice(person_attach=person, exchange_rates=data_exchange_rates)
+            foo.save()
+
+            reverse_url = reverse('sales_to_customer_url', args=[foo.id])
+            return redirect(reverse_url)
+    return HttpResponse(status=403)
+
 
 
 class SalesToCustomer(LoginRequiredMixin, View):
 
-    def get(self,request,invoice_id):
+    def get(self, request, invoice_id):
 
         obj = SalesPersonInvoice.objects.filter(pk=invoice_id).values(
             'exchange_rates__exchange_rates','person_attach__id','status','person_attach__discount',
@@ -546,10 +596,21 @@ class SalesToCustomer(LoginRequiredMixin, View):
         if request.is_ajax():
             obj = MaterialSaleObject.objects.filter(person_invoice_attach=invoice_id).values(
                 'detail_attach__detail_name__name', 'detail_attach__detail_name__part_num',
-                'detail_attach__detail_name__specification',
-                'quantity', 'detail_attach__incoming_price','sale_price', 'id',)
+                'detail_attach__detail_name__specification','quantity', 'detail_attach__incoming_price',
+                'sale_price', 'id', 'person_invoice_attach__exchange_rates__exchange_rates',
+                'detail_attach__attach_for_incoming__exchange_rates__exchange_rates')
             if obj.exists():
-                return JsonResponse(list(obj),safe=False)
+                data =[]
+                for item in obj:
+                    incoming_exchange_rates = float(item['detail_attach__attach_for_incoming__exchange_rates__exchange_rates'])
+                    incoming_price = float(item['detail_attach__incoming_price'])
+                    sales_exchange_rates = float(item['person_invoice_attach__exchange_rates__exchange_rates'])
+                    incoming_price_normal = (incoming_price / incoming_exchange_rates) * sales_exchange_rates
+                    normalize_incoming_price = round(incoming_price_normal, 2)
+                    muted_item = item.copy()
+                    muted_item.update({'normalize_incoming_price':normalize_incoming_price})
+                    data.append(muted_item)
+                return JsonResponse(data,safe=False)
             else: return HttpResponse(status=200)
         else:
             context = {
@@ -576,6 +637,7 @@ class SalesToCustomer(LoginRequiredMixin, View):
                 #with transaction.atomic():
                     #obj.update(detail_attach__quantity=F('detail_attach__quantity')-F('quantity'))
                 obj.filter(quantity=0).delete()
+                # Декриментация запчастей на складе
                 for item in obj:
                     #invc = item.quantity * item.sale_price
                     item.detail_attach.quantity = item.detail_attach.quantity - item.quantity
@@ -597,9 +659,14 @@ class SalesToCustomer(LoginRequiredMixin, View):
                         else: return HttpResponse(status=400)
                     else:
                         return HttpResponse(status=403)
-                    sum_inv = round(sum_invoice['sum_sales'],2)
-                    person_invoice.update(status=True,invoice_sum=sum_inv,payment_state=payment_status)
-                    response = reverse('sales_invoice_url',args=[invoice_id])
+                    sum_inv = round(sum_invoice['sum_sales'], 2)
+                    person_invoice.update(status=True, invoice_sum=sum_inv)
+                    if payment_status:
+                        person_invoice.update(date_of_payment=datetime.now(), payment_state=payment_status)
+                    # Сохраннеи коэфициента наценки
+                    if not person_invoice[0].person_attach.role == 'OW':
+                        calculation_and_save_own_margin_mat_sales_obj(**{'person_invoice_attach__pk': invoice_id})
+                    response = reverse('sales_invoice_url', args=[invoice_id])
                     return JsonResponse({'url':response})
                 response = reverse('sales_invoice_url', args=[invoice_id])
                 return JsonResponse({'url': response})
@@ -663,8 +730,7 @@ def sales_to_customer_filter(request):
         return JsonResponse(data_ret, safe=False)
 
     '''
-
-    if request.method=='GET' and request.is_ajax():
+    if request.method == 'GET' and request.is_ajax():
         data = request.GET
         incom_info_chiper = IncomInfoShipper(data)
         incom_info_chiper.is_valid()
@@ -727,7 +793,7 @@ def sales_to_customer_filter(request):
 
 
 @login_required
-def sales_to_customer_add_detail(request,invoice_id):
+def sales_to_customer_add_detail(request, invoice_id):
 
     if request.method == 'POST' and request.is_ajax():
         data = request.POST['value']
@@ -735,33 +801,55 @@ def sales_to_customer_add_detail(request,invoice_id):
             return JsonResponse({'error':'Эта запчасть уже есть в списке!'},safe=False)
         if not SalesPersonInvoice.objects.filter(id=invoice_id).exists():
             return HttpResponse(status=404)
+
         foo = SalesPersonInvoice.objects.filter(id=invoice_id).values(
-            'exchange_rates__exchange_rates','person_attach__discount')
+            'exchange_rates__exchange_rates','person_attach__discount','person_attach__role')
+        detail_info = Detail.objects.filter(pk=int(data)).values(
+            'incoming_price', 'attach_for_incoming__exchange_rates__exchange_rates')
+        role = foo[0]['person_attach__role']
+
         exchange_rates = float(foo[0]['exchange_rates__exchange_rates'])
-        discount = float(foo[0]['person_attach__discount'])
-        discount = discount / 100
-        markup = Markup.objects.last()
-        markup = float(markup.markup)
-        detail_info = Detail.objects.filter(pk=int(data)).values('incoming_price',
-                                                                      'attach_for_incoming__exchange_rates__exchange_rates')
-        detail_info = detail_info[0]
-        incoming_price = detail_info['incoming_price']
-        incoming_exchange_rates = detail_info['attach_for_incoming__exchange_rates__exchange_rates']
-        val = (incoming_price / incoming_exchange_rates) * exchange_rates
-        if val < incoming_price:
-            val = incoming_price
-        # место для наценки
-        val_markup =  (val * markup)
-        val = val_markup - val*discount
-        val = round(val,0)
+        incoming_price = detail_info[0]['incoming_price']
+        incoming_exchange_rates = detail_info[0]['attach_for_incoming__exchange_rates__exchange_rates']
+        # Нормализация круса продажи относитьльно курса закупки
+        val_normalize = (incoming_price / incoming_exchange_rates) * exchange_rates
+        # Проверка не меньше ли стала цена
+        if val_normalize < incoming_price:
+            val_normalize = incoming_price
+        val_normalize = round(val_normalize, 2)
+        # Проверка не является ли продажный ордер на владельца(без наценки)
+        if not role == 'OW':
+            discount = float(foo[0]['person_attach__discount'])
+            discount = discount / 100
+            markup = Markup.objects.last()
+            markup = float(markup.markup)
+            val_markup = (val_normalize * markup)
+            recommended_selling_price = val_markup - val_markup * discount
+        else: recommended_selling_price = val_normalize
+        recommended_selling_price = round(recommended_selling_price, 2)
+
         obj = MaterialSaleObject.objects.create(detail_attach_id=int(data), person_invoice_attach_id=invoice_id,
-                                                sale_price=val,quantity=1)
-        obj = MaterialSaleObject.objects.filter(id = obj.id).values(
+                                                sale_price=recommended_selling_price, quantity=1)
+
+        obj = MaterialSaleObject.objects.filter(pk=obj.pk).values(
                 'detail_attach__detail_name__name', 'detail_attach__detail_name__part_num',
-                'detail_attach__detail_name__specification',
-                'quantity', 'detail_attach__incoming_price','sale_price', 'id',
+                'detail_attach__detail_name__specification','quantity', 'sale_price', 'id'
             )
-        return JsonResponse(list(obj),safe=False)
+        #import pdb
+        #pdb.set_trace()
+        dict_obj = obj[0]
+        dict_obj.update({'normalize_incoming_price':val_normalize})
+        ''' 
+        fields = ['detail_attach__detail_name__name', 'detail_attach__detail_name__part_num',
+                'detail_attach__detail_name__specification', 'normalize_incoming_price', 'quantity',
+                  'sale_price', 'id']
+        Template = namedtuple('MatSaleObjList', fields)
+        new_obj = [Template(**i) for i in dict_obj]
+        '''
+        data_for_return = []
+        data_for_return.append(dict_obj)
+
+        return JsonResponse(data_for_return, safe=False)
 
     else:return HttpResponse(status=404)
 
@@ -781,51 +869,82 @@ def sales_to_customer_delete_detail(request):
 @login_required
 def sales_to_customer_change_quant_price(request):
 
-    def tools_validate_quant_price(data):
-        #Валидация полей quantity and price
-        if data == '': return {'error':'Значение не должно быть пустым'}
-        if '-' in data: return {'error':'Значение не должно быть отрицательным'}
-        result = re.findall(r'\.',data)
-        if len(result) >= 1:
-            result = re.split(r'\.', data)
-            if len(result[0]) > 4 or len(result[1]) > 2:
-                return {'error': 'Макс длинна целого 4, дробного 2'}
-        elif not len(result):
-            if len(data) > 4: return {'error': 'Макс длинна целого числа 4, дробного 2'}
-        else:
-            return {'error':'"." должна быть одна'}
-
-        return data
-
-
     if request.method == "POST" and request.is_ajax():
         data = request.POST
-        obj = data['new_val']
+        val = data['new_val']
         pk = data['id']
-        new_val = tools_validate_quant_price(obj)
+        field = data['field']
+        if not val:
+            return JsonResponse({'error':'Не валидные данные'})
+        if field == 'sale_price':
+            valid_data = MatSaleObjChangeSalePrice({field: val})
+        elif field == 'quantity':
+            valid_data = MatSaleObjChangeQuantity({field: val})
+        else: return HttpResponse(status=404)
+        if not valid_data.is_valid():
+            if valid_data.errors:
+                return JsonResponse({'error': valid_data.errors[field]})
+        valid_val = valid_data.cleaned_data[field]
 
-        if 'error' in new_val:
-            return JsonResponse(new_val,safe=False)
-
-        if data['field'] == 'sale_price':
-            val = materialSaleObject_check_actual_salePrice(pk,new_val)
+        if field == 'sale_price':
+            val = materialSaleObject_check_actual_salePrice(pk, valid_val)
             if not val:
-                foo = MaterialSaleObject.objects.filter(id=pk).update(sale_price=new_val)
+                foo = MaterialSaleObject.objects.filter(id=pk).update(sale_price=valid_val)
                 if foo: return HttpResponse(status=200)
                 else: return HttpResponse(status=403)
             else:
                 return val
 
-        elif data['field'] == 'quantity':
-            #import pdb
-            #pdb.set_trace()
-            res = materialSaleObject_check_actual_quantity(pk,new_val)
-            if not res:
-                foo = MaterialSaleObject.objects.filter(id=pk).update(quantity=new_val)
-                if foo:return HttpResponse(status=200)
-                else:return HttpResponse(status=403)
-            else: return res
+        elif field == 'quantity':
+            res = materialSaleObject_check_actual_quantity(pk, valid_val)
+            return res
+
         return HttpResponse(status=403)
+
+
+@login_required
+def ajax_get_own_coefficient(request):
+    if request.is_ajax() and request.method == 'GET':
+        data = request.GET
+        pk = data['mat_sales_obj_pk']
+        foo = MaterialSaleObject.objects.filter(pk=pk).values('detail_attach__pk')
+        if not foo.exists():
+            return HttpResponse(status=404)
+        detail_attach_identifier = foo[0]['detail_attach__pk']
+
+        obj = MaterialSaleObject.objects.filter(detail_attach__pk=detail_attach_identifier).exclude(
+            person_invoice_attach__person_attach__role='OW'
+        ).annotate(
+            full_name=Concat('person_invoice_attach__person_attach__last_name', V(' '),
+                             'person_invoice_attach__person_attach__first_name', V(' ('),
+                             'person_invoice_attach__person_attach__role', V(')')),
+            incoming_price=Concat('detail_attach__incoming_price', V(' ('),
+                                  'detail_attach__attach_for_incoming__exchange_rates__exchange_rates',
+                                  V('€)'), output_field=CharField()),
+            sa_price=Concat('sale_price', V(' ('), 'person_invoice_attach__exchange_rates__exchange_rates',
+                            V('€)'), output_field=CharField())).values(
+            'pk', 'full_name', 'person_invoice_attach__date_create', 'incoming_price', 'own_margin',
+            'sa_price')
+        if obj.exists():
+            for i in obj:
+                try:
+                    i['person_invoice_attach__date_create'] = i['person_invoice_attach__date_create'].strftime("%d.%m.%Y %H:%M")
+                except KeyError:
+                    continue
+        fields = ['pk', 'full_name', 'person_invoice_attach__date_create', 'incoming_price', 'own_margin',
+                  'sa_price']
+        Template = namedtuple('MatSaleObjList', fields)
+        new_obj = [Template(**i) for i in obj]
+        return JsonResponse(new_obj, safe=False)
+    return HttpResponse(status=404)
+
+@login_required
+def ajax_calculate_coefficient(request):
+    if request.is_ajax() and request.method == 'POST':
+        data = request.POST
+
+
+
 
 class Sales_to_customer_list(LoginRequiredMixin, View):
     def get(self,request):
@@ -835,7 +954,7 @@ class Sales_to_customer_list(LoginRequiredMixin, View):
             quer = SalesPersonInvoice.objects.all().annotate(
                 full_name=Concat('person_attach__last_name',V(' '),'person_attach__first_name',V(' '),
                                  'person_attach__patronymic_name')).values(
-                'id', 'full_name','date_create', 'status', 'payment_state','date_of_payment','invoice_sum').order_by('-id')
+                'id', 'full_name','date_create', 'status', 'payment_state', 'date_of_payment', 'invoice_sum').order_by('-id')
             obj = Paginator(quer,25)
             if request.GET.get('page'):
                 try:
@@ -882,22 +1001,25 @@ def sales_to_customer_list_change_payment_state(request):
 
 
 class Sales_invoice(LoginRequiredMixin,View):
-    def get(self,request,sales_invoice):
+
+    def get(self, request, sales_invoice):
         obj = SalesPersonInvoice.objects.filter(id=sales_invoice).values(
-            'person_attach__last_name','person_attach__first_name','person_attach__patronymic_name','person_attach__tell',
+            'person_attach__last_name','person_attach__first_name', 'person_attach__patronymic_name',
+            'person_attach__tell',
             'exchange_rates__exchange_rates','status','payment_state','invoice_sum')
-        details = MaterialSaleObject.objects.filter(person_invoice_attach=sales_invoice).annotate(
-            sum=F('sale_price')*F('quantity')).values('sum','detail_attach__detail_name__name','detail_attach__detail_name__part_num',
-                                                     'detail_attach__detail_name__specification','detail_attach__detail_name__id',
-                                                     'quantity','sale_price')
-        #import pdb
-        #pdb.set_trace()
-        return render(request,'srvbd/sales_invoice.html',{'person_data':obj,'details':details})
+        details = MaterialSaleObject.objects.filter(person_invoice_attach=sales_invoice
+                                                    ).annotate(sum=F('sale_price')*F('quantity'))\
+            .values('sum', 'detail_attach__detail_name__name', 'detail_attach__detail_name__part_num',
+                    'detail_attach__detail_name__specification', 'detail_attach__detail_name__id', 'quantity',
+                    'sale_price')
+
+        return render(request,'srvbd/sales_invoice.html', {'person_data': obj, 'details':details,
+                                                           'sales_invoice': sales_invoice})
 
 
 class PartsReturn(LoginRequiredMixin, View):
 
-    def get(self,request,invoice_id):
+    def get(self, request, invoice_id):
         if SalesPersonInvoice.objects.filter(id=invoice_id, status=True).exists():
             obj = SalesPersonInvoice.objects.filter(id=invoice_id).values(
                 'person_attach__last_name', 'person_attach__first_name', 'person_attach__patronymic_name',
@@ -906,13 +1028,13 @@ class PartsReturn(LoginRequiredMixin, View):
             if obj[0]['date_create']:
                 obj[0]['date_create'] = obj[0]['date_create'].strftime("%d.%m.%Y %H:%M")
             parts = MaterialSaleObject.objects.filter(person_invoice_attach=invoice_id).values(
-                'id','detail_attach__detail_name__id','detail_attach__detail_name__name',
-                'detail_attach__detail_name__part_num','detail_attach__detail_name__specification',
+                'id','detail_attach__detail_name__id', 'detail_attach__detail_name__name',
+                'detail_attach__detail_name__part_num', 'detail_attach__detail_name__specification',
                 'quantity','sale_price')
-            return render(request,'srvbd/parts_return.html',{'inv_id':invoice_id,'person_data': obj,'parts':parts})
+            return render(request, 'srvbd/parts_return.html', {'inv_id': invoice_id, 'person_data': obj, 'parts': parts})
         else: return HttpResponse(status=404)
 
-    def post(self,request,invoice_id):
+    def post(self, request, invoice_id):
         if request.is_ajax():
             data = request.POST.get('data')
             if data:
@@ -920,8 +1042,8 @@ class PartsReturn(LoginRequiredMixin, View):
                 for el in data:
                     pk = el.get('id')
                     value = float(el.get('value'))
-                    obj = MaterialSaleObject.objects.filter(pk=pk,person_invoice_attach=invoice_id).values(
-                        'quantity','detail_attach__quantity')
+                    obj = MaterialSaleObject.objects.filter(pk=pk, person_invoice_attach=invoice_id).values(
+                        'quantity', 'detail_attach__quantity')
                     if obj.exists():
                         mat_quantity = obj[0]['quantity']
                         det_quantity = obj[0]['detail_attach__quantity']
@@ -929,19 +1051,53 @@ class PartsReturn(LoginRequiredMixin, View):
                         if quantity_update < 0:
                             continue
                         new_det_quantity = det_quantity + value
-                        MaterialSaleObject.objects.filter(pk=pk).update(quantity=quantity_update)
-                        Detail.objects.filter(material_sale = pk).update(
-                            quantity = new_det_quantity,status_delete = False)
-                    else: continue
+                        if quantity_update == 0:
+                            MaterialSaleObject.objects.filter(pk=pk).delete()
+                        else:
+                            MaterialSaleObject.objects.filter(pk=pk).update(quantity=quantity_update)
+                        Detail.objects.filter(material_sale=pk).update(
+                            quantity=new_det_quantity, status_delete=False)
+                    else:continue
                 person_invoice = SalesPersonInvoice.objects.filter(id=invoice_id)
                 sum_invoice = MaterialSaleObject.objects.filter(person_invoice_attach=invoice_id).aggregate(
                     sum_sales=Sum(F('quantity') * F('sale_price')))
                 sum_inv = round(sum_invoice['sum_sales'], 2)
                 person_invoice.update(status=True, invoice_sum=sum_inv,)
                 url = reverse('sales_invoice_url', args=[invoice_id])
-                return JsonResponse({'data':url},safe=False)
+                return JsonResponse({'data': url}, safe=False)
             return HttpResponse(status=404)
         else: return HttpResponse(status=404)
+
+@login_required
+def print_receipt(request, invoice_id,):
+    if request.method == 'GET':
+        '''
+        # Create a file-like buffer to receive PDF data.
+        buffer = io.BytesIO()
+
+        # Create the PDF object, using the buffer as its "file."
+        p = canvas.Canvas(buffer)
+
+        # Draw things on the PDF. Here's where the PDF generation happens.
+        # See the ReportLab documentation for the full list of functionality.
+        p.drawString(100, 100, "Hello world.")
+
+        # Close the PDF object cleanly, and we're done.
+        p.showPage()
+        p.save()
+
+        # FileResponse sets the Content-Disposition header so that browsers
+        # present the option to save the file.
+        return FileResponse(buffer, as_attachment=False, filename='hello.pdf')
+        '''
+
+        results = {'obj':'Hello world!'}
+        return render_to_pdf('srvbd/print.html', {'pagesize': 'A4', 'mylist': results})
+
+
+
+
+
 
 @login_required
 def ajax_return_parts_del_part(request):
@@ -954,6 +1110,8 @@ def tools_ajax_exchange_rates_usd_privat24(request):
     if request.method == 'GET' and request.is_ajax():
         result = tools_get_exchange_rates_EUR_privat24()
         if result:
+            result = float(result)
+            result = round(result, 2)
             #ExchangeRates.objects.create(exchange_rates=result)
             result = {'exchange_rates': result}
             #print(result)
@@ -1007,13 +1165,39 @@ def telegram_hook(request):
         #import pdb;
         #pdb.set_trace()
 
+@login_required
+def inform_sales(request):
+    # Sample.objects.filter(date__range=["2011-01-01", "2011-01-31"]) sum_profit
+    # мой pk = 1 игоря = 3
+    d = datetime.date(year=2020, month=7, day=1)
+    obj = SalesPersonInvoice.objects.filter(date_of_payment__gte=date(2020,7,1))
+    obj.filter(payment_state=True).values(
+        'material_person_invoice__quantity','material_person_invoice__sale_price',
+        'material_person_invoice__detail_attach__incoming_price'
+    ).annotate(sum_turnover=F('material_person_invoice__quantity')*F('material_person_invoice__sale_price'),
+               sum_profit=F(''))
 
+    elems = MaterialSaleObject.objects.exclude(
+        Q(person_invoice_attach__person_attach__pk=1) & Q(person_invoice_attach__person_attach__pk=3)
+    ).filter(person_invoice_attach__payment_state=True,person_invoice_attach__date_create__month=7).values(
+        'quantity','sale_price','detail_attach__incoming_price').annotate(
+        sum_sale=F('quantity')*F('sale_price'),
+        difference_sum=F('quantity')*(F('sale_price')-F('detail_attach__incoming_price'))).aggregate(
+        sum_turnover=Sum('sum_sale'),sum_profit=Sum('difference_sum'))
 
+    elems = MaterialSaleObject.objects.exclude(person_invoice_attach__person_attach__pk=1).exclude(
+        person_invoice_attach__person_attach__pk=3).values(
+        'quantity', 'sale_price', 'detail_attach__incoming_price').annotate(
+        sum_sale=F('quantity') * F('sale_price'),
+        difference_sum=F('quantity') * (F('sale_price') - F('detail_attach__incoming_price'))).aggregate(
+        sum_turnover=Sum('sum_sale'), sum_profit=Sum('difference_sum'))
 
-
-
-
-
+    elems = MaterialSaleObject.objects.exclude(person_invoice_attach__person_attach__pk=1).exclude(
+        person_invoice_attach__person_attach__pk=3).exclude(person_invoice_attach__person_attach__role='MA').values(
+        'quantity', 'sale_price', 'detail_attach__incoming_price').annotate(
+        sum_sale=F('quantity') * F('sale_price'),
+        difference_sum=F('quantity') * (F('sale_price') - F('detail_attach__incoming_price'))).aggregate(
+        sum_turnover=Sum('sum_sale'), sum_profit=Sum('difference_sum'))
 
 
 

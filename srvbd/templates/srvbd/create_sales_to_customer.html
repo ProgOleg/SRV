@@ -5,9 +5,14 @@
 {% if person_create %}
 
 	<script type="text/javascript" src="{% static 'srvbd/js/create_sales_to_customer.js' %}"></script>
+	<title>Создание расходного ордера</title>
 	<form action="{% url 'create_sales_to_customer_url' %}" method="post">
 		{% csrf_token %}
-		<div class="container">
+		<div class="container-fluid container-md">
+			<div class="row">
+						<h3 class="ml-1">Продажа запчастей клиенту</h3>
+					</div>
+					<hr>
 			<div class="form-row">
 				<div class="col-md-4">
 					<label>Фамилия:</label>
@@ -81,7 +86,6 @@
 					{{person_create.discount}}
 				</div>
 			</div>
-			<br>
 			<div class="row">
 				<div class="col mt-2">
 					<button type="submit" class="btn btn-success float-right">Добавить</button>

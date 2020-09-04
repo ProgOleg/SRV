@@ -1,5 +1,6 @@
 $('document').ready(function() {
-
+	//ЖЕСТКО КОДИРОВАНЫЙ УРЛ!!!!
+	var url_sales_to_customer_create = '/sales_to_customer_create/'
 	function render_table(data){
 		//$('#new_detail_table').removeClass('remoove');
 		$.each(data,function(i, e) {
@@ -39,6 +40,7 @@ $('document').ready(function() {
 				//console.log(elem[index])
 				//console.log(el)
 				var foo = $('<td>')
+
 				if (index == 3){
 					if ( el == true){foo.attr('class', 'bg-success').text(el)}
 					else if (el == false) {foo.attr('class', 'bg-danger').text(el)}
@@ -50,6 +52,10 @@ $('document').ready(function() {
 				else if (index == 0){
 					if (elem[3] === false){foo.append($('<a>').text(el).attr({'href':`${url_edit}${el}`}))}
 					else {foo.append($('<a>').text(el).attr({'href':`${url}${el}`}))}
+				}
+				else if (index == 1){
+					foo.append(`<div class='dropdown'><a class=' dropdown-toggle'  id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>${el}</a><div class='dropdown-menu' aria-labelledby='dropdownMenuButton'><a class='dropdown-item' href='${url_sales_to_customer_create+data[i][0]}'>Расходный ордер</a></div></div>`)
+
 				}
 				else {foo.text(el)}
 
@@ -68,6 +74,7 @@ $('document').ready(function() {
 				}
 			
 			});
+			$('<a>').text(el).attr({'class':"dropdown-toggle","id":`dropdownMenuOffset_${data[i][0]}`, "data-toggle":"dropdown", "aria-haspopup":"true", "aria-expanded":"false", "data-offset":"10,20"})
 			*/
 		});
 	}

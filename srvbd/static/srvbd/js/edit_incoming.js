@@ -17,7 +17,7 @@ $('document').ready(function(){
 					if (i === 'incoming_price'|| i === 'quantity'){
 						obj.append($('<td>').append(
 							$('<input/>', {
-								'type':'number','step':'0.01','value':e,'class':'input_ch','name':i,'data-id':id})
+								'type':'number','step':'0.01','value':e,'class':'input_ch form-control','name':i,'data-id':id})
 						));
 					}
 					else{
@@ -166,5 +166,11 @@ $('document').ready(function(){
 			}
 		})
 	})	
+
+	$('#but_dropping').click(function(event) {
+		$('#filter_table').addClass('remoove')
+		
+	});
+	
 });	
 

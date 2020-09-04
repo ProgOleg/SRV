@@ -1,14 +1,14 @@
 {% extends 'srvbd/base.html' %}
 {% load static %}
 {% block content %}
-	<div class ="container">
+	<div class ="container-fluid container-md">
 		{% if incom %}
       <div class="row">
-        <h3>Приход запчастей</h3>
+        <h3 class="ml-1">Приход запчастей</h3>
       </div>
       <hr>
       <div class="row">
-        <h4>Информация:</h2>
+        <h4 class="ml-1">Информация:</h2>
       </div>
       <dl class="row">
           <dt class="col-sm-3">Дата:</dt>
@@ -21,46 +21,47 @@
         <hr>
     {% endif %}
     <div class="row">
-      <h4>Запчасти:</h4>
+      <h4 class="ml-1">Запчасти:</h4>
     </div>
-    <br>
-		<table  class="table table-striped table table-bordered">
-  			<thead class="thead-dark table-condensed table-bordered table-hover">
-    			<tr>
-    				<th scope="col">id</th>
-    				<th scope="col">Наименование</th>
-     				<th scope="col">Партномер производителя</th>
-    				<th scope="col">Описание</th>
-    				<th scope="col">Тип запчасти</th>
-    				<th scope="col">Вид устройства</th>
-    				<th scope="col">Производитель</th>
-        		<th scope="col">Кол-во</th>
-        		<th scope="col">Стоимость</th>
-        		<th scope="col">Итого</th>
-    			</tr>
-  			</thead>
-  			<tbody>
-  				{% if details %}
-    				{% for detail in details %}
-        			<tr>
-      				  <th scope="row">{{detail.spar_part__id}}</th>
-      				  <td>{{detail.spar_part__name}}</td>
-      				  <td>{{detail.spar_part__part_num}}</td>
-      				  <td>{{detail.spar_part__specification}}</td>
-      				  <td>{{detail.spar_part__attachment_part__type_spar_part}}</td>
-      				  <td>{{detail.spar_part__attachment_appliances__type_appliances}}</td>
-      				  <td>{{detail.spar_part__attachment_manufacturer__manufacturer}}</td>
-            	  <td>{{detail.quantity}}</td>
-                <td>{{detail.incoming_price}}</td>
-            	  <td>{{detail.sum}}</td>
-          		</tr>
-    				{%endfor%}
-    			{%endif%}
-          <tr>
-            <th scope="row">Всего:</th>
-            <td colspan="9">{{equal_details}}</td>
-          </tr>
-    		</tbody>
-    	</table>
+    <div class="table-responsive-md mt-3">
+  		<table  class="table table-striped table table-bordered " data-table-sm-css="">
+    			<thead class="thead-dark table-condensed table-bordered table-hover">
+      			<tr>
+      				<th scope="col">id</th>
+      				<th scope="col">Наименование</th>
+       				<th scope="col">Партномер производителя</th>
+      				<th scope="col">Описание</th>
+      				<th scope="col">Тип запчасти</th>
+      				<th scope="col">Вид устройства</th>
+      				<th scope="col">Производитель</th>
+          		<th scope="col">Кол-во</th>
+          		<th scope="col">Стоимость</th>
+          		<th scope="col">Итого</th>
+      			</tr>
+    			</thead>
+    			<tbody>
+    				{% if details %}
+      				{% for detail in details %}
+          			<tr>
+        				  <th scope="row">{{detail.spar_part__id}}</th>
+        				  <td>{{detail.spar_part__name}}</td>
+        				  <td>{{detail.spar_part__part_num}}</td>
+        				  <td>{{detail.spar_part__specification}}</td>
+        				  <td>{{detail.spar_part__attachment_part__type_spar_part}}</td>
+        				  <td>{{detail.spar_part__attachment_appliances__type_appliances}}</td>
+        				  <td>{{detail.spar_part__attachment_manufacturer__manufacturer}}</td>
+              	  <td>{{detail.quantity}}</td>
+                  <td>{{detail.incoming_price}}</td>
+              	  <td>{{detail.sum}}</td>
+            		</tr>
+      				{%endfor%}
+      			{%endif%}
+            <tr>
+              <th scope="row">Всего:</th>
+              <td colspan="9">{{equal_details}}</td>
+            </tr>
+      		</tbody>
+      	</table>
+      </div>
 	</div>
 {% endblock %}

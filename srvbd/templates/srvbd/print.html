@@ -1,0 +1,61 @@
+<html>
+	<head>
+	<style tape="text/css">
+		#print{width:800px;background-color:#AFEEEE;padding:30px 30px;}
+		caption{caption-side:top; text-align: center;font-size:16px; padding: 10px 0px;}
+		table{border: 1px solid grey; border-collapse: collapse;width:100%;}
+		th{width:auto;border: 1px solid grey;}
+		td{width:auto;height:1em;border: 1px solid grey;}
+		table-tr:last-child{align:center;}
+		@page {
+                size: {{ pagesize }};
+                margin: 1cm;
+                @frame footer {
+                    -pdf-frame-content: footerContent;
+                    bottom: 0cm;
+                    margin-left: 9cm;
+                    margin-right: 9cm;
+                    height: 1cm;
+                }
+            }
+	</style>
+	</head>
+
+
+	<body>
+		<div id="print">
+			<table>
+				<caption><b>ФОП "Биков И.В", м.Запоріжжя, вул.Жуковського, буд. 44, ипн: 2979718158</b></caption>
+				<caption><b>Товарний чек № __________ от____________р.<b></caption>
+				<tr>
+					<th>№пп</th>
+					<th>назва товару</th>
+					<th>ед</th>
+					<th>кількість</th>
+					<th>ціна</th>
+					<th>сума</th>
+				</tr>
+				<tr>
+					<td>{{mylist.}}</td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr >
+					<td ></td>
+				</tr>
+			</table>
+
+		<br>
+		<a><b>Усього на сумму: ___________________________________________грн.__________коп.</a>
+		<br>
+		<br>
+		<a>Продавець: Биков І.В           ___________</a>
+		</b>
+
+		</div>
+
+	</body>
+</html>
