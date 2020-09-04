@@ -108,8 +108,11 @@ $('document').ready(function(){
 		$('#table_body').empty()
 		new_detail_table(page,data)
 	});
-
-
-
+	/*
+	$('#but_dropping').click(function(event) {
+		$('#filter_table').addClass('remoove')
+		
+	});
+	*/
 
 });

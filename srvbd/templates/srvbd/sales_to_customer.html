@@ -1,132 +1,192 @@
 {% extends 'srvbd/base.html' %}
 {% load static %}
 {% block content %}
-	
-	<script type="text/javascript" src="{% static 'srvbd/js/sales_to_customer.js' %}"></script>
-		<div class="container" data-index-url="{% url 'sales_to_customer_url' invoice_id %}">
-			<form id="filter_form" action="{% url 'ajax_sales_to_customer_filter' %}">
-				<div class="row">
-					<h3>Продажа запчастей клиенту</h3>
-				</div>
-				<br>
-				<hr>
-				<dl class="row">
-					<dt class="col-sm-3">Клиент:</dt>
-					<dd class="col-sm-9">{{person}}</dd>
-					<dt class="col-sm-3">Телефон:</dt>
-					<dd class="col-sm-9">{{info.person_attach__tell}}</dd>
-					<dt class="col-sm-3">Дисконт:</dt>
-					<dd class="col-sm-9">{{info.person_attach__discount}} %</dd>
-					<dt class="col-sm-3">Курс:</dt>
-					<dd class="col-sm-9">{{info.exchange_rates__exchange_rates}} € </dd>					
-				</dl>
-				<hr>
-				<div class="row">
-					<h4>Фильтр</h4>
-				</div>
-				<div class="row justify-content-between">
-					<div class="col-md-6">
-	    				<label for="name">Наименование:</label>
-	    				{{detail_filter.name}}
-	    			</div>
-	    			<div class="col-md-4">
-						<label for="select_applience">Выберите тип устройства:</label>
-	    				{{specification_filter.attachment_appliances}}
-	    				<datalist id="attachment_appliances"></datalist>
-	    			</div>
-				</div>
-				<div class="row justify-content-between">
-					<div class="col-md-6">
-						<label for="specification">Описаине:</label>
-	    				{{detail_filter.specification}}
-	    			</div>
-	    			<div class="col-md-4">
-	    				<label for="select_type_sparpart">Выберите тип запчасти:</label>
-	    				{{specification_filter.attachment_part}}
-	    				<datalist id="attachment_part"></datalist>
-	    			</div>
-				</div>
-				<div class="row justify-content-between">
-					<div class="col-md-6">
-						<label for="part_num">Парт-номер произвоидетеля:</label>
-	    				{{detail_filter.part_num}}
-	    			</div>
-	    			<div class="col-md-4">
-	    				<label for="select_manufacturer">Выберите производителя:</label>
-	    				{{specification_filter.attachment_manufacturer}}
-	    				<datalist id="attachment_manufacturer"></datalist>
-	    			</div>
-				</div>
+	<div class="container-fluid container-md">
+		<title>Продажа запчастей клиенту</title>
+		<script type="text/javascript" src="{% static 'srvbd/js/sales_to_customer.js' %}"></script>
+		<input type="hidden" id="discount" value="{{info.person_attach__discount}}">
+			<div data-index-url="{% url 'sales_to_customer_url' invoice_id %}">
+				<form id="filter_form" action="{% url 'ajax_sales_to_customer_filter' %}">
+					<div class="row">
+						<h3 class="ml-1">Продажа запчастей клиенту</h3>
+					</div>
+					<hr>
+					<div class="row align-items-start mt-2">
+						<div class="col">
+							<dt class="">Клиент:</dt>
+							<dd class="">{{person}}</dd>
+							<dt class="">Телефон:</dt>
+							<dd class="">{{info.person_attach__tell}}</dd>
+						</div>	
+						<div class="col">
+							<dt class="">Дисконт:</dt>
+							<dd class="">{{info.person_attach__discount}} %</dd>
+							<dt class="">Курс:</dt>
+							<dd class="">{{info.exchange_rates__exchange_rates}} € </dd>				
+						</div>
+					</div>
+					<hr>
+					<div class="row">
+						<h4 class="ml-1">Фильтр</h4>
+					</div>
+					<div id="filter_inputs">
+						<div class="row justify-content-between">
+							<div class="col-md-6 ">
+			    				<label for="name">Наименование:</label>
+			    				{{detail_filter.name}}
+			    			</div>
+			    			<div class="col-md-4 ">
+								<label for="select_applience">Выберите тип устройства:</label>
+			    				{{specification_filter.attachment_appliances}}
+			    				<datalist id="attachment_appliances"></datalist>
+			    			</div>
+						</div>
+						<div class="row justify-content-between">
+							<div class="col-md-6">
+								<label for="specification">Описаине:</label>
+			    				{{detail_filter.specification}}
+			    			</div>
+			    			<div class="col-md-4">
+			    				<label for="select_type_sparpart">Выберите тип запчасти:</label>
+			    				{{specification_filter.attachment_part}}
+			    				<datalist id="attachment_part"></datalist>
+			    			</div>
+						</div>
+						<div class="row justify-content-between">
+							<div class="col-md-6">
+								<label for="part_num">Парт-номер произвоидетеля:</label>
+			    				{{detail_filter.part_num}}
+			    			</div>
+			    			<div class="col-md-4">
+			    				<label for="select_manufacturer">Выберите производителя:</label>
+			    				{{specification_filter.attachment_manufacturer}}
+			    				<datalist id="attachment_manufacturer"></datalist>
+			    			</div>
+						</div>
+					</div>
+					<div class="row justify-content-end mt-3">
+						<div class="col-auto">
+				    		<button id="but_dropping" class="btn btn-danger " type="reset" >Сброс</button>
+				    		<button id="but_filter" class="btn btn-success" type="submit" >Фильтр</button>
+				    	</div>
+				    </div>
+			    </form>
 				
-				<div class="row justify-content-end">
-					<div class="col-md-1 col-md-offset-4 mt-4">
-			    		<button id="but_filter" class="btn btn-success" type="submit" >Фильтр</button>
-			    	</div>
-			    </div>
-		    </form>
-			
-		    <br>
-		    <div class="row justify-content-center remoove" id ="filter_table">
-				<table  class="table table-striped table-bordered " >
-		  			<thead class="thead-dark table-condensed table-bordered table-hover">
-		    			<tr>
-		    				<th scope="col">№ Id</th>
-		    				<th scope="col">Наим.</th>
-		     				<th scope="col">Партномер производ.</th>
-		      				<th scope="col">Описание</th>
-		      				<th scope="col">Тип запчасти</th>
-		      				<th scope="col">Вид устройства</th>
-		      				<th scope="col">Производитель</th>
-		              		<th scope="col">Приход</th>
-		              		<th scope="col">Кол-во</th>
-		              		<th scope="col">Стоимость</th>
-		              		<th scope="col">Дейсвие</th>
-		    			</tr>
-		  			</thead>
-		  			<tbody id="filter_table_body" data-ajax_url="{% url 'ajax_tools_sales_to_customer_add_detail' invoice_id %}">
+			    
+			    <div class="table-responsive-md remoove" id ="filter_table">
+			    	<div class="justify-content-center mt-3">
+						<table  class="table table-striped table table-bordered" data-table-sm-css="" >
+				  			<thead class="thead-dark table-condensed table-bordered table-hover">
+				    			<tr>
+				    				<th width="2%">№ Id</th>
+				    				<th width="10%">Наим.</th>
+				     				<th width="10%">Партномер производ.</th>
+				      				<th >Описание</th>
+				      				<th width="10%">Тип запчасти</th>
+				      				<th width="10%">Вид устройства</th>
+				      				<th width="10%">Производитель</th>
+				              		<th width="7%">Приход</th>
+				              		<th width="5%">Кол-во</th>
+				              		<th width="5%">Цена</th>
+				              		<th width="5%">Дейсвие</th>
+				    			</tr>
+				  			</thead>
+				  			<tbody id="filter_table_body" data-ajax_url="{% url 'ajax_tools_sales_to_customer_add_detail' invoice_id %}">
 
-		    		</tbody>
-		    	</table>
-	    	</div>
-	    	<div class="remoove" id="new_detail_table" data-ajax-change-quant-price-url="{% url 'ajax_sales_to_customer_change_quant_price' %}">
-	    		<div class="row">
-	    			<h4>Запчасти на клиента:</h4>
-	    		</div>
-	    		<hr>
-		    	<br>
-		    	<div class="row justify-content-center">
-					<table class="table table-striped table table-bordered" >
-			  			<thead class="thead-dark table-condensed table-bordered table-hover">
-			    			<tr>
-			      				<th scope="col">Наименование</th>
-			     		 		<th scope="col">Партномер производителя</th>
-			      				<th scope="col">Описание</th>
-			      				<th scope="col">Количество</th>
-			      				<th scope="col">Цена прихода</th>
-			      				<th scope="col">Цена продажи</th>
-			      				<th scope="col">Действие</th>
-			    			</tr>
-			  			</thead>
-				  			<tbody id="tbody_new_detail" data-form-action="{% url 'ajax_sales_to_customer_delete_detail' %}">
-					    		
-							</tbody>
-			    	</table>
+				    		</tbody>
+				    	</table>
+				    </div>
+					<hr>
 		    	</div>
-	    	</div>
-	    	<div class="row justify-content-end">
-		    	<input type="checkbox" id ='payment' checked data-toggle="toggle" data-onstyle="outline-success" data-offstyle="outline-danger" data-width="130.67" data-on="Оплачено" data-off="Долг">
-		    	{% if not payment_state %}
-		    		<script type="text/javascript">$('#payment').bootstrapToggle('off')</script>
-		    	{% endif %}
-	        </div>
-	        <br>
-	    	<div class="row justify-content-end">
-	    		<button id="save" tupe="button" class="btn btn-success btn-lg">Сохранить</button>
-	    	</div>
-	    	
-		</div>
+		    	<div class="remoove mt-3" id="new_detail_table" data-ajax-change-quant-price-url="{% url 'ajax_sales_to_customer_change_quant_price' %}">
+		    		<div class="row">
+		    			<h4 class="ml-1">Запчасти на клиента:</h4>
+		    		</div>
+		    		
+			    	<div class="table-responsive-md">
+			    		<div class="justify-content-center mt-2">
+							<table class="table table-striped table table-bordered" data-table-sm-css="" >
+					  			<thead class="thead-dark table-condensed table-bordered table-hover">
+					    			<tr>
+					      				<th width="15%">Наим.</th>
+					     		 		<th width="15%">Партномер производ.</th>
+					      				<th >Описание</th>
+					      				<th width="10%">Количество</th>
+					      				<th width="7%">Цена прихода</th>
+					      				<th width="10%">Цена продажи</th>
+					      				<th width="5%">Действие</th>
+					      				<th width="5%">Опции</th>
+					    			</tr>
+					  			</thead>
+						  			<tbody id="tbody_new_detail" data-form-action="{% url 'ajax_sales_to_customer_delete_detail' %}">
+							    		
+									</tbody>
+					    	</table>
+				    	</div>
+			    	</div>	
+		    	</div>
+		    	
+				<div class="row justify-content-end mt-3">
+					<div class="col-auto">
+				    	<input type="checkbox" id ='payment' checked data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-width="130.67" data-on="Оплачено" data-off="Долг">
+				    	{% if not payment_state %}
+				    		<script type="text/javascript">$('#payment').bootstrapToggle('off')</script>
+				    	{% endif %}
+				    </div>
+		        </div>
+		    	<div class="row justify-content-end mt-3">
+		    		<div class="col-auto">
+		    			<button id="save" tupe="button" class="btn btn-success btn-lg">Сохранить</button>
+		    		</div>
+		    	</div>
+		    	
+			</div>
 	
-		
+		</div>
+		<div class="modal fade" id="history_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-ajax_url="{% url 'ajax_get_own_coefficient_url' %}">
+		  	<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+			        	<h4 class="modal-title" id="exampleModalLabel">История продаж</h4>
+			        	<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			          		<span aria-hidden="true">&times;</span>
+			        	</button>
+		      		</div>
+		      		<div class="modal-body">
+		        		<div class="container-fluid">
+		        			<div class="row">
+		        				<div class="col-md-12">
+		        					<label for="coefficient">Коэффициент:</label>
+		        					<div class="d-flex align-items-between">
+		        						<input type="number" id="coefficient_input" class="input_ch form-control">
+		        						<button type="button" id="coefficient_submit" class="btn btn-success ml-4">Применить</button>
+		        					</div>
+		        				</div>
+							</div>
+							<div class="row mt-3 justify-content-center ">
+								<table class=" table table-striped table table-bordered table-sm ">
+									<thead class="thead-dark table-condensed table-bordered table-hover">
+								    	<tr>
+								      		<th width="25%" >Клиент</th>
+								      		<th width="21%" >Дата прод</th>
+								      		<th width="17%" >Цена вход</th>
+								      		<th width="19%">Коэф</th>
+								      		<th width="17%" >Цена прод</th>
+								    	</tr>
+								  	</thead>
+								  	<tbody id="modal_tbody">
+
+								  	</tbody>
+								</table>
+							</div>
+		        		</div>
+		      		</div>
+		      		<div class="modal-footer">
+		        		
+		      		</div>
+		    	</div>
+		 	</div>
+		</div>
 
 
 

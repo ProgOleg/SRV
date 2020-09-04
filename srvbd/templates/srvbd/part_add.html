@@ -1,15 +1,16 @@
 {% extends 'srvbd/base.html' %}
 {% load static %}
 {% block content %}
+    <title>Cправочник</title>
     <script type="text/javascript" src="{% static 'srvbd/js/part_add.js' %}"></script>
     <div id="url_specification" data-ajax_url="{% url 'add_specification' %}"></div>
-    <div class="container mt-2">
+    <div class="container-fluid container-md">
         <div class="row">
-            <h3>Cправочник:</h3>
+            <h3 class="ml-1">Cправочник:</h3>
         </div>
         <hr>
         <div class="row">
-            <h4>Добавление запчасти:</h2>
+            <h4 class="ml-1">Добавление запчасти:</h2>
         </div>
         <form action="{% url 'add_part_url' %}" method="post">
             {% csrf_token %}
@@ -85,11 +86,12 @@
                     {% endif %}
                 </div>
             </div>
-            <div class="row justify-content-end">
-                <div class="col-md-1 col-md-offset-4 mt-4">
-                    <button id="part_add_button" class="btn btn-success" type="submit" >Добавить</button>
-                </div>
+            <div class="row justify-content-end mt-3">
+              <div class="col-auto">
+                <button id="part_add_button" class="btn btn-success" type="submit" >Добавить</button>
+              </div>
             </div>
+            
         </form>
         
         <div class="modal fade" id="type_spar_part_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -151,59 +153,4 @@
         </div>
     </div>
 
-<!--
-  <div class = "container" id = "mar_top">
-    <h2>Добавление запчасти в справочник:</h2>
-    <form action="{% url 'add_part_url' %}" method="post">
-      {% csrf_token %}
-      <div class ="form-group">
-        {% for field in form %}
-          {% if field.errors %}
-            <div class="alert alert-danger">{{ field.errors}}</div>
-          {% endif %}
-          {{ field.label }}
-          {{ field }}
-        {% endfor %}
-      </div>
-      <button tupe = "submit"class="btn btn-success" name = "but_1">Добавить</button>
-    </form>
-    <h2>Если вышеупомянутые описания отсутствуют:</h2>
-    <h4>Добавить тип запчасти в справочник:</h4>
-    <form action="{% url 'add_part_url' %}" method="post">
-      <div class = "form-group">
-        {% if field.errors %}
-            <div class="alert alert-danger">{{ field.errors}}</div>
-          {% endif %}
-        {% csrf_token %}
-        {{ form_add_attachment_part.label }}
-        {{ form_add_attachment_part }}
-      </div>
-      <button tupe="submit" class="btn btn-success" name = "but_2">Добавить</button>
-    </form>
-    <h4>Добавить вид техники в справочник:</h4>
-    <form action="{% url 'add_part_url' %}" method="post">
-      <div class = "form-group">
-        {% csrf_token %}
-        {% if field.errors %}
-            <div class="alert alert-danger">{{ field.errors}}</div>
-          {% endif %}
-        {{ form_add_attachment_appliances.label }}
-        {{ form_add_attachment_appliances }}
-      </div>
-      <button tupe="submit" class="btn btn-success" name = "but_3">Добавить</button>
-    </form>
-    <h4>Добавить произвоидетля:</h4>
-    <form action="{% url 'add_part_url' %}" method="post">
-      <div class="form-group">
-        {% csrf_token %}
-        {% if field.errors %}
-            <div class="alert alert-danger">{{ field.errors}}</div>
-          {% endif %}
-        {{ form_add_manufacturer.label }}
-        {{ form_add_manufacturer }}
-      </div>
-      <button tupe="submit" class="btn btn-success" name = "but_4">Добавить</button>
-    </form>
-  </div>
-  -->
 {% endblock %}
