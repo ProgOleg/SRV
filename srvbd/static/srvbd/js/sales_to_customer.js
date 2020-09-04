@@ -255,6 +255,7 @@ jQuery(document).ready(function($) {
 		var markup = normalize_incoming_price * coefficient
 
 		if (discount){
+			var disc = discount/100
 			var new_val = markup - (markup * disc)
 		}
 			else{
