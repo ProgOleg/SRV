@@ -246,22 +246,23 @@ jQuery(document).ready(function($) {
 
 	function change_and_validation_valid_data_sale_price_input(coefficient){
 
-		if (discount){
+		var obj = $(`#sale_price_${mat_sales_obj_pk}`)
+		var id = mat_sales_obj_pk
+		var field = 'sale_price'
+		var form = $('div#new_detail_table').data('ajax-change-quant-price-url');
+		var normalize_incoming_price = $(`[data-normalize_incoming_price_pk=${id}]`).data('value')
+		normalize_incoming_price = parseFloat(normalize_incoming_price)
+		var markup = normalize_incoming_price * coefficient
 
-			var disc = discount / 100
-			var obj = $(`#sale_price_${mat_sales_obj_pk}`)
-			var id = mat_sales_obj_pk
-			var field = 'sale_price'
-			var form = $('div#new_detail_table').data('ajax-change-quant-price-url');
-			var normalize_incoming_price = $(`[data-normalize_incoming_price_pk=${id}]`).data('value')
-			normalize_incoming_price = parseFloat(normalize_incoming_price)
-			var markup = normalize_incoming_price * coefficient
+		if (discount){
 			var new_val = markup - (markup * disc)
-			new_val = round(new_val,2)
-			change_input_val_quant_saleprice(id,field,new_val,obj,form)
-			obj.val(new_val)
 		}
-			else{}
+			else{
+				var new_val = markup
+			}
+		new_val = round(new_val,2)
+		change_input_val_quant_saleprice(id,field,new_val,obj,form)
+		obj.val(new_val)
 		$('#history_modal').modal('hide')
 
 	}
