@@ -8,3 +8,6 @@ dump.json
 .DS_Store
 .idea/
 venv
+/dump_bd_1.dump
+/dump_bd_2.sql
+/dump_bd
