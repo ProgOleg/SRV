@@ -1,0 +1,56 @@
+{% extends 'srvbd/base.html' %}
+{% load static %}
+{% block content %}
+	<script type="text/javascript" src="{% static 'srvbd/js/parts_required_to_order.js' %}"></script>
+	<title>Запчасти к заказу</title>
+	<div class="container-fluid container-md">
+		<div class="row">
+			<h3 class="ml-1">Запчасти к заказу</h3>
+		</div>
+		<hr>
+		<div class=" table-responsive-md table  justify-content-center-lg mt-3" id ="table" data-ajax_url=''>
+			<table  class=" justify-content-center  table table-striped table-bordered  " data-table-sm-css="" data-ajax_url = "">
+	  			<thead class="thead-dark table-condensed table-bordered table-hover">
+	    			<tr>
+	    				<th width="2%" >id</th>
+						<th width="10%">Наименование</th>
+						<th width="10%">Партномер производителя</th>
+						<th width="10%">Тип запчасти</th>
+	              		<th width="6%" >Дейсвие</th>
+	    			</tr>
+	  			</thead>
+	  			<tbody id="tbody_detail" data-ajax_url="{% url 'parts_required_to_order_url' %}">
+
+	    		</tbody>
+	    	</table>
+	    	<div class="dropdown-menu" aria-labelledby="dropdownMenuOffset_23">
+		      <a class="dropdown-item" href="#">Action</a>
+		      <a class="dropdown-item" href="#">Another action</a>
+		      <a class="dropdown-item" href="#">Something else here</a>
+		    </div>
+    	</div>
+	
+	</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% endblock %}

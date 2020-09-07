@@ -279,3 +279,27 @@ def calculation_and_save_own_margin_mat_sales_obj(*args, **kwargs):
         margin_coefficient = sale_price / (incoming_price_normal - incoming_price_normal * (person_discount / 100))
         margin_coefficient = round(margin_coefficient, 2)
         MaterialSaleObject.objects.filter(pk=pk).update(own_margin=margin_coefficient)
+
+
+class HistotySales():
+
+    def all_history_mat_sales_obj(self,catalog_pk):
+
+        obj = MaterialSaleObject.objects.filter(detail_attach__detail_name__pk=catalog_pk)
+        obj = obj.values(
+
+        )
+
+
+
+
+
+
+
+
+
+
+
+
+
+

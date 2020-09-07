@@ -228,8 +228,8 @@ class MaterialSaleObject(models.Model):
     person_invoice_attach = models.ForeignKey("SalesPersonInvoice", on_delete=models.SET_NULL,
                                               related_name='material_person_invoice', default=None, null=True)
 
-    quantity = models.FloatField(default=0,null=True)
-    sale_price = models.FloatField(default=0,null=True)
+    quantity = models.FloatField(default=0, null=True)
+    sale_price = models.FloatField(default=0, null=True)
     own_margin = models.FloatField(default=1)
 
 
