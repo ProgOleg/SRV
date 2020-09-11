@@ -350,7 +350,7 @@ def need_to_order(months=2):
             recommended = 0
         else:
             recommended = abs(recommended)
-            recommended = round(recommended, 2)
+            recommended = round(recommended)
         elem.update({'quantity': mean, 'recommended': recommended})
         data.append(elem)
     #data = division_by_count_months(data_result_new)
