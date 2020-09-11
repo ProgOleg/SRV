@@ -1204,10 +1204,8 @@ def inform_sales(request):
 def parts_required_to_order(request):
 
     if request.method == 'GET' and request.is_ajax():
-        obj = Detail.objects.filter(status_delete=True).order_by('detail_name__attachment_part__type_spar_part').values(
-            'detail_name__pk', 'detail_name__name', 'detail_name__part_num', 'detail_name__attachment_part__type_spar_part',
-        )
-        return JsonResponse(list(obj), safe=False)
+        obj = need_to_order()
+        return JsonResponse(obj, safe=False)
 
     if request.method == 'GET':
         return render(request, 'srvbd/parts_required_to_order.html')

@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect
 from django.http import HttpResponse,JsonResponse
 from django.template import loader
 from django.template.loader import get_template
-
+from datetime import *
 from .models import *
 from .forms import *
 from django.views.generic import View
@@ -22,7 +22,7 @@ from io import StringIO
 from xhtml2pdf import pisa
 from django.template.loader import get_template
 from cgi import escape
-
+from dateutil.relativedelta import relativedelta
 
 #Выборкадля рендеринка <datalist>
 def data_list_select_type_sparpart(request):
@@ -281,9 +281,9 @@ def calculation_and_save_own_margin_mat_sales_obj(*args, **kwargs):
         MaterialSaleObject.objects.filter(pk=pk).update(own_margin=margin_coefficient)
 
 
-class HistotySales():
+class HistorySales:
 
-    def all_history_mat_sales_obj(self,catalog_pk):
+    def all_history_mat_sales_obj(self, catalog_pk):
 
         obj = MaterialSaleObject.objects.filter(detail_attach__detail_name__pk=catalog_pk)
         obj = obj.values(
@@ -291,15 +291,99 @@ class HistotySales():
         )
 
 
+def need_to_order(months=2):
+
+    def division_by_count_months(months=3,*data):
+        new_data = []
+        return new_data
+
+
+    first_date = datetime.today() - relativedelta(months=months)
+    last_date = datetime.today()
+
+    obj_for_range_time = MaterialSaleObject.objects.filter(
+        person_invoice_attach__date_create__range=(first_date, last_date),
+    ).values('quantity', 'detail_attach__detail_name__pk', 'detail_attach__detail_name__name',
+             'detail_attach__detail_name__part_num', 'detail_attach__detail_name__attachment_part__type_spar_part',
+             'detail_attach__pk', 'detail_attach__quantity' )
+
+    data_result = {}
+    for elem in obj_for_range_time:
+        pk_detail = elem.get('detail_attach__pk')
+        data = data_result.get(pk_detail)
+        if not data:
+            data_result.update({pk_detail: elem})
+        else:
+            quantity_elem = elem.get('quantity')
+            quantity_data = data.get('quantity')
+            new_quantity = float(quantity_elem) + float(quantity_data)
+            data.update({'quantity': new_quantity})
+            data_result.update({pk_detail: data})
+
+    data_result = data_result.values()
+    data_result_new = {}
+    for elem in data_result:
+        pk_spar_part = elem.get('detail_attach__detail_name__pk')
+        if not data_result_new.get(pk_spar_part):
+            data_result_new.update({pk_spar_part: elem})
+        else:
+            quantity_detail_data_result_new = data_result_new.get(pk_spar_part).get('detail_attach__quantity')
+            quantity_mat_data_result_new = data_result_new.get(pk_spar_part).get('quantity')
+            quantity_detail_elem = elem.get('detail_attach__quantity')
+            quantity_mat_elem = elem.get('quantity')
+            value = data_result_new.get(pk_spar_part)
+            new_quantity_detail = float(quantity_detail_data_result_new) + float(quantity_detail_elem)
+            new_quantity_mat_elem = float(quantity_mat_data_result_new) + float(quantity_mat_elem)
+            value.update({'detail_attach__quantity': new_quantity_detail, 'quantity': new_quantity_mat_elem})
+            data_result_new.update({pk_spar_part: value})
+    #import pdb
+    #pdb.set_trace()
+    data_result_new = data_result_new.values()
+    data = []
+    for elem in data_result_new:
+        quantity_details = elem.get('detail_attach__quantity')
+        quantity = elem.get('quantity')
+        mean = float(quantity) / months
+        mean = round(mean, 2)
+        recommended = float(quantity_details) - mean
+        if recommended > 0:
+            recommended = 0
+        else:
+            recommended = abs(recommended)
+        elem.update({'quantity': mean, 'recommended': recommended})
+        data.append(elem)
+    #data = division_by_count_months(data_result_new)
+    return data
 
 
 
 
+    '''
+    # data_result.append({'id': elem.get('detail_attach__detail_name__pk')})
+    obj = SparPart.objects.filter(
+        detail_in_detail__material_sale__person_invoice_attach__date_create__range=(first_date, last_date))
+    obj = obj.annotate(sum_mat_quan=Sum('detail_in_detail__material_sale__quantity'),
+                       sum_det_quant=Sum('detail_in_detail__quantity'))
+    obj = obj.values('pk', 'sum_mat_quan', 'sum_det_quant')
 
+    a = obj.annotate(sum_det=Sum('detail_in_detail__quantity')).values('pk', 'sum_det')
 
+    obj = MaterialSaleObject.objects.filter(
+        person_invoice_attach__date_create__range=(first_date, last_date)
+    )
+    obj = obj.values(
+        'quantity', 'detail_attach__pk', 'detail_attach__detail_name__pk'
+    )
 
+    obj = Detail.objects.all()
+    obj = obj.annotate(
+        sum_mat_quan=Sum('material_sale__quantity')
+    )
+    obj = obj.values('sum_mat_quan', 'pk')
 
-
-
-
-
+    obj = Detail.objects.all().values('pk', 'material_sale__quantity')
+    obj = obj.annotate(
+        sum_mat_quan=Sum('material_sale__quantity')
+    )
+    obj.values('pk', 'sum_mat_quan')
+    '''

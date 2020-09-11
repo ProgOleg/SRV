@@ -53,9 +53,9 @@ class SparPart(models.Model):
     attachment_part = models.ForeignKey('TypeSparPart',on_delete=models.SET_NULL,
                                     related_name='attachment_for_part',null=True)
     attachment_appliances = models.ForeignKey('TypeAppliances',on_delete=models.SET_NULL,
-                                            related_name='attachment_for_appliances',null=True)
+                                            related_name='attachment_for_appliances', null=True)
     attachment_manufacturer = models.ForeignKey('Manufacturer',on_delete=models.SET_NULL,
-                                            related_name='attachment_for_manufacturer',blank=True,null=True)
+                                            related_name='attachment_for_manufacturer', blank=True,null=True)
 
     def __str__(self):
         return "{} {}".format(self.pk, self.name)
@@ -141,10 +141,10 @@ class DetailInIncomList(models.Model):
 #***__Модель_запчастей_на складе__***
 
 class Detail(models.Model):
-    detail_name = models.ForeignKey('SparPart', on_delete=models.SET_NULL, related_name='detail_in_detail',null=True)
-    incoming_price = models.FloatField(default=0,null=True)
-    quantity = models.FloatField(default=0,null=True)
-    attach_for_incoming = models.ForeignKey('Incoming',on_delete=models.SET_NULL,related_name='attash_incom',null=True)
+    detail_name = models.ForeignKey('SparPart', on_delete=models.SET_NULL, related_name='detail_in_detail', null=True)
+    incoming_price = models.FloatField(default=0, null=True)
+    quantity = models.FloatField(default=0, null=True)
+    attach_for_incoming = models.ForeignKey('Incoming', on_delete=models.SET_NULL, related_name='attash_incom', null=True)
     status_delete = models.BooleanField(default=False)
 
     def __str__(self):
@@ -156,7 +156,7 @@ class Detail(models.Model):
 class DeviceUnderRepair(models.Model):
     outside_srv = 'OU'
     inside_srv = "IN"
-    choices_of_type_repair = ((outside_srv,'выездная'),(inside_srv,'в сервисе'))
+    choices_of_type_repair = ((outside_srv, 'выездная'), (inside_srv, 'в сервисе'))
 
     type_of_repair = models.CharField(max_length=2,choices=choices_of_type_repair,default=inside_srv)
     external_condition = models.CharField("Внешнее стостояние",max_length=500)
@@ -166,9 +166,9 @@ class DeviceUnderRepair(models.Model):
     status_ready = models.BooleanField(default=False)
     status_delivery = models.BooleanField(default=False)
 
-    device_attach = models.ForeignKey("Device",on_delete=models.SET_NULL,related_name='device_in_repair',null=True)
-    person_attach = models.ForeignKey("Person",on_delete=models.SET_NULL,related_name='device_person',null=True)
-    comment = models.ForeignKey("Comment", on_delete=models.SET_NULL, related_name='device_comment',blank=True,null=True)
+    device_attach = models.ForeignKey("Device", on_delete=models.SET_NULL, related_name='device_in_repair', null=True)
+    person_attach = models.ForeignKey("Person", on_delete=models.SET_NULL, related_name='device_person', null=True)
+    comment = models.ForeignKey("Comment", on_delete=models.SET_NULL, related_name='device_comment', blank=True, null=True)
 
 
     def __str__(self):
@@ -203,7 +203,7 @@ class Comment(models.Model):
 #***__Виртуальная запчасть(не существует на складе).Объект расходного ордера!__***
 
 class VirtualSaleObject(models.Model):
-    spar_part_attach = models.ForeignKey("SparPart",on_delete=models.SET_NULL,related_name='virtual_sale',null=True)
+    spar_part_attach = models.ForeignKey("SparPart",on_delete=models.SET_NULL,related_name='virtual_sale', null=True)
 
     repair_invoice_attach = models.ForeignKey("RepairInvoice", on_delete=models.SET_NULL, related_name='virtual_repair_invoice',
                                               default=None,null=True)
@@ -215,10 +215,10 @@ class VirtualSaleObject(models.Model):
 
 
     def __str__(self):
-        return "{} {} {}".format(self.spar_part_attach,self.quantity,self.sale_price)
+        return "{} {} {}".format(self.spar_part_attach, self.quantity, self.sale_price)
 
 
-#***__Материально существующая  запчасть на складе).Объект расходного ордера!__***
+# ***__Материально существующая  запчасть на складе).Объект расходного ордера!__***
 
 class MaterialSaleObject(models.Model):
     detail_attach = models.ForeignKey("Detail", on_delete=models.SET_NULL, related_name='material_sale', null=True)
@@ -237,7 +237,7 @@ class MaterialSaleObject(models.Model):
         return "{} {} {}".format(self.detail_attach, self.quantity, self.sale_price)
 
 
-#***__Расходный ордер продажи запчастей клиенту__***
+# ***__Расходный ордер продажи запчастей клиенту__***
 
 class SalesPersonInvoice(models.Model):
     person_attach = models.ForeignKey("Person", on_delete=models.SET_NULL, related_name='detail_sale',null=True)

@@ -57,10 +57,10 @@ urlpatterns = [
     path('ajax_return_parts_del_part/',views.ajax_return_parts_del_part, name='ajax_url_return_parts_del_part'),
     #Продажный ордер
     path('sales_invoice/<int:sales_invoice>',views.Sales_invoice.as_view(), name='sales_invoice_url'),
-#Аналитика
+# Аналитика
     # Запчасти необходимые к заказу
     path('parts_required_to_order/', views.parts_required_to_order, name='parts_required_to_order_url'),
-    #TEST
+# TEST
     path('ajax_tools_exchange_rates_usd_privat24/', views.tools_ajax_exchange_rates_usd_privat24,name="get_usd_exchange_rates"),
     path('print_receipt/<int:invoice_id>/', views.print_receipt, name='print_receipt_url'),
     path('telegram_bot/', views.telegram_bot, name='telegram_bot_url'),
