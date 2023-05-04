@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '-_=$q$f=#s$zqhs_1-aji_l$+*qu=edxnnqca(7(i3q8f0&v@6'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "True") in ("1", "true", "True")
 
 ALLOWED_HOSTS = ['*']
 
@@ -77,10 +77,10 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'new_db',
-        'USER': 'oleg',
-        'PASSWORD': '12a378d',
-        'HOST': '127.0.0.1',
+        'NAME': os.getenv("DB_NAME", 'srv_site'),
+        'USER': os.getenv("DB_USER", 'postgres'),
+        'PASSWORD': os.getenv("DB_PASSWORD", ''),
+        'HOST': os.getenv("DB_HOST", '127.0.0.1'),
         'PORT': '5432',
     }
 }
