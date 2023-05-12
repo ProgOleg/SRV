@@ -6,17 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('srvbd', '0052_materialsaleobject_own_margin'),
+        ("srvbd", "0052_materialsaleobject_own_margin"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='materialsaleobject',
-            name='own_margin',
+            model_name="materialsaleobject",
+            name="own_margin",
         ),
         migrations.AlterField(
-            model_name='person',
-            name='role',
-            field=models.CharField(choices=[('MA', 'Мастер'), ('CL', 'Клиент')], default='CL', max_length=2),
+            model_name="person",
+            name="role",
+            field=models.CharField(choices=[("MA", "Мастер"), ("CL", "Клиент")], default="CL", max_length=2),
         ),
     ]

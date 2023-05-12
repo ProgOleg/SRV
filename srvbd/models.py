@@ -1,9 +1,5 @@
 from django.db import models
 from django.contrib.postgres.fields import JSONField
-# from django.utils import timezone
-# from django.db.models.functions import Concat
-# from django.db.models import Value as V, Q
-# from django.db.models import Sum
 
 
 class Person(models.Model):

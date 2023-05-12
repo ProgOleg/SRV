@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('srvbd', '0010_detail_detailinlist'),
+        ("srvbd", "0010_detail_detailinlist"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='incoming',
-            name='statys',
+            model_name="incoming",
+            name="statys",
             field=models.BooleanField(default=False),
         ),
     ]

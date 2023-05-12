@@ -1,90 +1,21 @@
-from django.shortcuts import render, redirect
-from django.http import HttpResponse, JsonResponse
-from django.template import loader
-from django.template.loader import get_template
-from datetime import datetime, timedelta
-from .models import *
-from .forms import *
-from django.views.generic import View
-import copy
-from copy import deepcopy
-import re
-from decimal import *
-from django.core import serializers
-from django.core.exceptions import ObjectDoesNotExist
-
-from time import sleep
+import datetime
 import requests
 import json
-from django.db.models import *
-from .views import *
 from io import StringIO
-from xhtml2pdf import pisa
+
+from django.http import HttpResponse, JsonResponse
 from django.template.loader import get_template
-# from cgi import escape
+from django.db.models import F, Func
+from xhtml2pdf import pisa
 from html import escape
-# from dateutil.relativedelta import relativedelta
-
-
-# Выборкадля рендеринка <datalist>
-def data_list_select_type_sparpart(request):
-    if request.method == "GET" and request.is_ajax():
-        data = request.GET.get("val")
-        if data:
-            try:
-                obj = list(
-                    TypeSparPart.objects.filter(type_spar_part__istartswith=data)[:100].values_list("type_spar_part")
-                )
-                return JsonResponse(obj, safe=False)
-            except IndexError:
-                obj = []
-        else:
-            obj = []
-        return JsonResponse(obj, safe=False)
-
-    return HttpResponse(status=404)
-
-
-# Выборкадля рендеринка <datalist>
-def data_list_select_manufacturer(request):
-    if request.method == "GET" and request.is_ajax():
-        data = request.GET.get("val")
-        if data:
-            try:
-                obj = list(Manufacturer.objects.filter(manufacturer__istartswith=data).values_list("manufacturer"))
-            except IndexError:
-                obj = []
-        else:
-            obj = []
-        return JsonResponse(obj, safe=False)
-    return HttpResponse(status=404)
-
-
-# Выборка по "Тип устройства(select_applience)" для рендеринка <datalist>
-def data_list_select_appliances(request):
-    if request.method == "GET" and request.is_ajax():
-        data = request.GET.get("val")
-        if data:
-            try:
-                obj = list(
-                    TypeAppliances.objects.filter(type_appliances__istartswith=data)[:100].values_list(
-                        "type_appliances"
-                    )
-                )
-            except IndexError:
-                obj = []
-        else:
-            obj = []
-        return JsonResponse(obj, safe=False)
-
-    return HttpResponse(status=404)
+from srvbd import models
 
 
 def lead_time(func):
     def time_show(*args, **kwargs):
-        start = datetime.now()
+        start = datetime.datetime.now()
         a = func(*args, **kwargs)
-        finish = datetime.now()
+        finish = datetime.datetime.now()
         print("Время выполнения функции: {}".format((finish - start).seconds))
         return a
 
@@ -96,7 +27,7 @@ def tools_get_exchange_rates_EUR_privat24():
 
     def date_for_requests(val):
         # Возвращает дату, в зависимости от входго значения (int) возвращает дат
-        foo = (datetime.now() - timedelta(val)).date().strftime("%d.%m.%Y")
+        foo = (datetime.datetime.now() - datetime.timedelta(val)).date().strftime("%d.%m.%Y")
 
         return foo
 
@@ -136,7 +67,7 @@ def tools_get_exchange_rates_EUR_privat24():
 
 def materialSaleObject_check_actual_salePrice(pk, new_val):
     # место для наценки
-    obj = MaterialSaleObject.objects.filter(id=pk).values(
+    obj = models.MaterialSaleObject.objects.filter(id=pk).values(
         "detail_attach__incoming_price",
         "detail_attach__attach_for_incoming__exchange_rates__exchange_rates",
         "person_invoice_attach__exchange_rates__exchange_rates",
@@ -158,7 +89,7 @@ def materialSaleObject_check_actual_salePrice(pk, new_val):
 
 
 def materialSaleObject_check_actual_quantity(pk, val):
-    obj_detail_quantity = MaterialSaleObject.objects.filter(id=pk).values("detail_attach__quantity")
+    obj_detail_quantity = models.MaterialSaleObject.objects.filter(id=pk).values("detail_attach__quantity")
     if not obj_detail_quantity.exists():
         return HttpResponse(status=404)
     obj_detail_quantity = float(obj_detail_quantity[0]["detail_attach__quantity"])
@@ -166,48 +97,8 @@ def materialSaleObject_check_actual_quantity(pk, val):
     if float(val) > obj_detail_quantity:
         return JsonResponse({"error": 'Кол-во не больше фактического - "{}"'.format(obj_detail_quantity)})
     else:
-        MaterialSaleObject.objects.filter(pk=pk).update(quantity=val)
+        models.MaterialSaleObject.objects.filter(pk=pk).update(quantity=val)
         return HttpResponse(status=200)
-
-
-def tools_ajax_check_tell(request):
-    def valid_tell(tell):
-        result = {}
-        n = "+38"
-        if tell[:3] != n:
-            if len(tell) == 10:
-                tell = n + tell
-            else:
-                result.update({"error": "Номер должен начинатся с +380!"})
-                return result
-        if len(tell) != 13:
-            result.update({"error": "Номер не соотвествующей длинны!"})
-            return result
-        for i in tell:
-            if i == "+":
-                continue
-            try:
-                int(i)
-            except ValueError:
-                result.update({"error": "Номер не должен состоять из букв!"})
-                return result
-        return tell
-
-    if request.method == "GET":
-        if request.is_ajax():
-            data_tell = request.GET["tell"]
-            valid_data = valid_tell(data_tell)
-            if "error" in valid_data:
-                return JsonResponse(valid_data, safe=False)
-            obj = list(
-                Person.objects.filter(tell=valid_data).values(
-                    "first_name", "last_name", "patronymic_name", "tell", "addres", "email", "discount", "role"
-                )
-            )
-            if obj:
-                return JsonResponse(obj, safe=False)
-            else:
-                return JsonResponse({"message": "Телефонный номер свободный"})
 
 
 class Round2(Func):
@@ -227,7 +118,7 @@ def check_actual_sales_meterial_sales_obj(sale_person_id, material_sale_obj_id):
     """
 
     obj = (
-        MaterialSaleObject.objects.filter(person_invoice_attach=sale_person_id)
+        models.MaterialSaleObject.objects.filter(person_invoice_attach=sale_person_id)
         .annotate(
             sum_exchange=Round2(
                 (
@@ -265,14 +156,14 @@ def render_to_pdf(template_src, context_dict):
 def check_actual_sales_price(obj_pk):
     # Прод запчасть цена
 
-    spart_part = Detail.objects.filter(pk=obj_pk).values("detail_name")
+    spart_part = models.Detail.objects.filter(pk=obj_pk).values("detail_name")
 
     if spart_part.exists():
         spart_part_pk = int(spart_part[0]["detail_name"])
     else:
         return HttpResponse(status=404)
 
-    another_mat_sale_obj = MaterialSaleObject.objects.filter(detail_attach__detail_name_pk=spart_part_pk)
+    another_mat_sale_obj = models.MaterialSaleObject.objects.filter(detail_attach__detail_name_pk=spart_part_pk)
     if another_mat_sale_obj.exists():
         another_mat_sale_obj = another_mat_sale_obj.values("sale_price")[:2]
     else:
@@ -285,7 +176,7 @@ class OwnMarginMatSalesObj:
 
 def calculation_and_save_own_margin_mat_sales_obj(*args, **kwargs):
 
-    obj = MaterialSaleObject.objects.filter(*args, **kwargs).values(
+    obj = models.MaterialSaleObject.objects.filter(*args, **kwargs).values(
         "pk",
         "person_invoice_attach__exchange_rates__exchange_rates",
         "person_invoice_attach__person_attach__discount",
@@ -309,26 +200,23 @@ def calculation_and_save_own_margin_mat_sales_obj(*args, **kwargs):
         # Вычисление коэфициента
         margin_coefficient = sale_price / (incoming_price_normal - incoming_price_normal * (person_discount / 100))
         margin_coefficient = round(margin_coefficient, 2)
-        MaterialSaleObject.objects.filter(pk=pk).update(own_margin=margin_coefficient)
+        models.MaterialSaleObject.objects.filter(pk=pk).update(own_margin=margin_coefficient)
 
 
 class HistorySales:
     def all_history_mat_sales_obj(self, catalog_pk):
 
-        obj = MaterialSaleObject.objects.filter(detail_attach__detail_name__pk=catalog_pk)
+        obj = models.MaterialSaleObject.objects.filter(detail_attach__detail_name__pk=catalog_pk)
         obj = obj.values()
 
 
 def need_to_order(months=2):
-    def division_by_count_months(months=3, *data):
-        new_data = []
-        return new_data
 
     # todo: fix relevant months
-    first_date = datetime.today() - timedelta(weeks=months * 4)
-    last_date = datetime.today()
+    first_date = datetime.datetime.today() - datetime.timedelta(weeks=months * 4)
+    last_date = datetime.datetime.today()
 
-    obj_for_range_time = MaterialSaleObject.objects.filter(
+    obj_for_range_time = models.MaterialSaleObject.objects.filter(
         person_invoice_attach__date_create__range=(first_date, last_date),
     ).values(
         "quantity",

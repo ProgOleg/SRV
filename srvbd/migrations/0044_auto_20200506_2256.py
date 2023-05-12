@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('srvbd', '0043_auto_20200427_2108'),
+        ("srvbd", "0043_auto_20200427_2108"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='salespersoninvoice',
-            name='invoice_sum',
+            model_name="salespersoninvoice",
+            name="invoice_sum",
             field=models.FloatField(default=0, null=True),
         ),
     ]

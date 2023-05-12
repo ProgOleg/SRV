@@ -7,45 +7,61 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('srvbd', '0006_auto_20190105_0101'),
+        ("srvbd", "0006_auto_20190105_0101"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='DetailInIncomList',
+            name="DetailInIncomList",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('incoming_price', models.DecimalField(decimal_places=2, max_digits=6)),
-                ('quantity', models.DecimalField(decimal_places=2, max_digits=6)),
-                ('detail_name', models.ForeignKey(on_delete=None, related_name='detail_in_incom_list', to='srvbd.SparPart')),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("incoming_price", models.DecimalField(decimal_places=2, max_digits=6)),
+                ("quantity", models.DecimalField(decimal_places=2, max_digits=6)),
+                (
+                    "detail_name",
+                    models.ForeignKey(on_delete=None, related_name="detail_in_incom_list", to="srvbd.SparPart"),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Incoming',
+            name="Incoming",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('incoming_date', models.DateField()),
-                ('exchange_rates', models.DecimalField(decimal_places=2, max_digits=4)),
-                ('detail_incoming', models.ForeignKey(on_delete=None, related_name='detail_for_incom_list', to='srvbd.DetailInIncomList')),
-                ('ship', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='attash_incoming_list', to='srvbd.Shipper')),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("incoming_date", models.DateField()),
+                ("exchange_rates", models.DecimalField(decimal_places=2, max_digits=4)),
+                (
+                    "detail_incoming",
+                    models.ForeignKey(
+                        on_delete=None, related_name="detail_for_incom_list", to="srvbd.DetailInIncomList"
+                    ),
+                ),
+                (
+                    "ship",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="attash_incoming_list",
+                        to="srvbd.Shipper",
+                    ),
+                ),
             ],
         ),
         migrations.RemoveField(
-            model_name='detail',
-            name='detail_name',
+            model_name="detail",
+            name="detail_name",
         ),
         migrations.RemoveField(
-            model_name='incominglist',
-            name='Ship',
+            model_name="incominglist",
+            name="Ship",
         ),
         migrations.RemoveField(
-            model_name='incominglist',
-            name='detail_incoming',
+            model_name="incominglist",
+            name="detail_incoming",
         ),
         migrations.DeleteModel(
-            name='Detail',
+            name="Detail",
         ),
         migrations.DeleteModel(
-            name='IncomingList',
+            name="IncomingList",
         ),
     ]

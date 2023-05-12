@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('srvbd', '0029_remove_detailinincomlist_selector_incom'),
+        ("srvbd", "0029_remove_detailinincomlist_selector_incom"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='detailinincomlist',
-            name='selector_incom',
-            field=models.ForeignKey(null=True, on_delete=None, related_name='select_incom', to='srvbd.Incoming'),
+            model_name="detailinincomlist",
+            name="selector_incom",
+            field=models.ForeignKey(null=True, on_delete=None, related_name="select_incom", to="srvbd.Incoming"),
         ),
     ]

@@ -7,24 +7,24 @@ import django.utils.timezone
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('srvbd', '0018_auto_20190221_2321'),
+        ("srvbd", "0018_auto_20190221_2321"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='repairinvoice',
-            name='date_create',
+            model_name="repairinvoice",
+            name="date_create",
             field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='device',
-            name='pnc',
-            field=models.CharField(blank=True, max_length=50, verbose_name='PNC-код'),
+            model_name="device",
+            name="pnc",
+            field=models.CharField(blank=True, max_length=50, verbose_name="PNC-код"),
         ),
         migrations.AlterField(
-            model_name='device',
-            name='serial_number',
-            field=models.CharField(blank=True, max_length=50, verbose_name='Серийный номер'),
+            model_name="device",
+            name="serial_number",
+            field=models.CharField(blank=True, max_length=50, verbose_name="Серийный номер"),
         ),
     ]

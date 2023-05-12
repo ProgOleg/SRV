@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('srvbd', '0048_auto_20200527_2311'),
+        ("srvbd", "0048_auto_20200527_2311"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='incoming',
-            name='currency',
-            field=models.CharField(choices=[('UAN', 'UAN'), ('EUR', 'EUR')], default='UAN', max_length=3),
+            model_name="incoming",
+            name="currency",
+            field=models.CharField(choices=[("UAN", "UAN"), ("EUR", "EUR")], default="UAN", max_length=3),
         ),
     ]

@@ -6,28 +6,37 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('srvbd', '0009_auto_20190124_0239'),
+        ("srvbd", "0009_auto_20190124_0239"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Detail',
+            name="Detail",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('incoming_price', models.DecimalField(decimal_places=2, max_digits=6)),
-                ('quantity', models.DecimalField(decimal_places=2, max_digits=6)),
-                ('attash_for_incoming', models.ForeignKey(on_delete=None, related_name='attash_incom', to='srvbd.Incoming')),
-                ('detail_name', models.ForeignKey(on_delete=None, related_name='detail_in_detail', to='srvbd.SparPart')),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("incoming_price", models.DecimalField(decimal_places=2, max_digits=6)),
+                ("quantity", models.DecimalField(decimal_places=2, max_digits=6)),
+                (
+                    "attash_for_incoming",
+                    models.ForeignKey(on_delete=None, related_name="attash_incom", to="srvbd.Incoming"),
+                ),
+                (
+                    "detail_name",
+                    models.ForeignKey(on_delete=None, related_name="detail_in_detail", to="srvbd.SparPart"),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='DetailInList',
+            name="DetailInList",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('incoming_price', models.DecimalField(decimal_places=2, max_digits=6)),
-                ('quantity', models.DecimalField(decimal_places=2, max_digits=6)),
-                ('detail_name', models.ForeignKey(on_delete=None, related_name='detail_detail_in_list', to='srvbd.SparPart')),
-                ('selector_incom', models.ForeignKey(on_delete=None, related_name='select_incom', to='srvbd.Incoming')),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("incoming_price", models.DecimalField(decimal_places=2, max_digits=6)),
+                ("quantity", models.DecimalField(decimal_places=2, max_digits=6)),
+                (
+                    "detail_name",
+                    models.ForeignKey(on_delete=None, related_name="detail_detail_in_list", to="srvbd.SparPart"),
+                ),
+                ("selector_incom", models.ForeignKey(on_delete=None, related_name="select_incom", to="srvbd.Incoming")),
             ],
         ),
     ]

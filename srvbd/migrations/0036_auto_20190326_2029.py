@@ -7,17 +7,23 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('srvbd', '0035_auto_20190326_2029'),
+        ("srvbd", "0035_auto_20190326_2029"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='incoming',
-            name='exchange_rates',
+            model_name="incoming",
+            name="exchange_rates",
         ),
         migrations.AlterField(
-            model_name='incoming',
-            name='exchange_ratest',
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='incoming_exchange_rates', to='srvbd.ExchangeRates'),
+            model_name="incoming",
+            name="exchange_ratest",
+            field=models.ForeignKey(
+                default=None,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="incoming_exchange_rates",
+                to="srvbd.ExchangeRates",
+            ),
         ),
     ]

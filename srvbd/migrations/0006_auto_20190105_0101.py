@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('srvbd', '0005_auto_20190105_0050'),
+        ("srvbd", "0005_auto_20190105_0050"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='sparpart',
-            name='part_num',
-            field=models.CharField(blank=True, max_length=30, null=True, unique=True, verbose_name='Парт номер'),
+            model_name="sparpart",
+            name="part_num",
+            field=models.CharField(blank=True, max_length=30, null=True, unique=True, verbose_name="Парт номер"),
         ),
     ]

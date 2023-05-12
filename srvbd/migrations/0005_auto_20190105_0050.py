@@ -7,18 +7,24 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('srvbd', '0004_auto_20190104_2202'),
+        ("srvbd", "0004_auto_20190104_2202"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='sparpart',
-            name='attachment_manufacturer',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='attachment_for_manufacturer', to='srvbd.Manufacturer'),
+            model_name="sparpart",
+            name="attachment_manufacturer",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="attachment_for_manufacturer",
+                to="srvbd.Manufacturer",
+            ),
         ),
         migrations.AlterField(
-            model_name='sparpart',
-            name='specification',
-            field=models.TextField(blank=True, max_length=2000, null=True, verbose_name='Описание'),
+            model_name="sparpart",
+            name="specification",
+            field=models.TextField(blank=True, max_length=2000, null=True, verbose_name="Описание"),
         ),
     ]

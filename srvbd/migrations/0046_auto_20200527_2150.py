@@ -6,20 +6,20 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('srvbd', '0045_shipper_store_website'),
+        ("srvbd", "0045_shipper_store_website"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Markup',
+            name="Markup",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('markup', models.FloatField(default=2)),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("markup", models.FloatField(default=2)),
             ],
         ),
         migrations.AddField(
-            model_name='person',
-            name='discount',
+            model_name="person",
+            name="discount",
             field=models.FloatField(default=0, null=True),
         ),
     ]

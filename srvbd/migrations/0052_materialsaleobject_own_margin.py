@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('srvbd', '0051_auto_20200806_2253'),
+        ("srvbd", "0051_auto_20200806_2253"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='materialsaleobject',
-            name='own_margin',
+            model_name="materialsaleobject",
+            name="own_margin",
             field=models.FloatField(default=1),
         ),
     ]

@@ -7,23 +7,32 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('srvbd', '0053_auto_20200904_0414'),
+        ("srvbd", "0053_auto_20200904_0414"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='materialsaleobject',
-            name='own_margin',
+            model_name="materialsaleobject",
+            name="own_margin",
             field=models.FloatField(default=1),
         ),
         migrations.AlterField(
-            model_name='materialsaleobject',
-            name='repair_invoice_attach',
-            field=models.ForeignKey(blank=True, default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='material_repair_invoice', to='srvbd.RepairInvoice'),
+            model_name="materialsaleobject",
+            name="repair_invoice_attach",
+            field=models.ForeignKey(
+                blank=True,
+                default=None,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="material_repair_invoice",
+                to="srvbd.RepairInvoice",
+            ),
         ),
         migrations.AlterField(
-            model_name='person',
-            name='role',
-            field=models.CharField(choices=[('MA', 'Мастер'), ('CL', 'Клиент'), ('OW', 'Собственник')], default='CL', max_length=2),
+            model_name="person",
+            name="role",
+            field=models.CharField(
+                choices=[("MA", "Мастер"), ("CL", "Клиент"), ("OW", "Собственник")], default="CL", max_length=2
+            ),
         ),
     ]
