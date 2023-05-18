@@ -1,5 +1,12 @@
 $('document').ready(function(){
+    // модальное окно для картинок
+    $('#myModal').on('show.bs.modal', function(event) {
+        var button = $(event.relatedTarget); // Кнопка, на которую было нажато
+        var imageSrc = button.data('image'); // Путь к изображению
 
+        var modal = $(this);
+        modal.find('#modalImage').attr('src', imageSrc); // Устанавливаем путь к изображению в модальном окне
+      });
 	var page = 1
 	var data = null
 	//ЖЕСТКО КОДИРОВАНЫЙ URL
@@ -30,6 +37,10 @@ $('document').ready(function(){
 			var obj = $('<tr/>');
 			$.each(this,function(i, elem) {
 				if (i == 'attach_for_incoming__id') {}
+				else if (i === 'detail_name__image_link') {
+				    var img = $('<img>').attr('src', elem).attr('data-toggle', 'modal').attr('data-target', '#myModal').attr('data-image', elem);
+                    obj.append($('<td>').append(img));
+				}
 				else {
 					var foo = $('<td>')
 					if(i == 'date_and_exch'){
@@ -47,20 +58,18 @@ $('document').ready(function(){
 
 	function new_detail_table(ind,data){
 		var url = filter_url + ind + '/'
-		$.get(url,data, function(data) {
+		$.get(url, data, function(data) {
 			render(data['obects'])
-			$('#count_obj').text(`Найденно ${data['count_obj']} объектов`)
+			$('#count_obj').text(`Найдено ${data['count_obj']} запчасти(ей)`)
 		}).fail(function(){
 			return null
 		})
-		
 	};
 
 	$(window).scroll(function(event) {
 		if ($(window).scrollTop() + $(window).height() >= $(document).height()){
 			page += 1
 			new_detail_table(page,data)
-
 		}
 	});
 
@@ -84,35 +93,10 @@ $('document').ready(function(){
 
 
 	$('#filter_form').submit(function(event){
-		/*
-		event.preventDefault();
-		page = 1
-		var filter_filds = $(this).serializeArray()
-		//var data = JSON.stringify(filter_filds)
-		var data = []
-		data.push({'filter': filter_filds})
-		data.push({'page':{'name':'page','value':page}})
-
-		console.log(data)
-		data = JSON.stringify(data)
-		$.get(filter_url,data, function(data) {
-			$('#filter_table_body').empty()
-			render(data)
-			//$('#filter_table_body').append(obj.fadeIn('400'));
-		});
-		*/
 		event.preventDefault();
 		page = 1
 		data = $(this).serializeArray()
-		//var filter_filds = JSON.stringify(data)
 		$('#table_body').empty()
 		new_detail_table(page,data)
 	});
-	/*
-	$('#but_dropping').click(function(event) {
-		$('#filter_table').addClass('remoove')
-		
-	});
-	*/
-
 });

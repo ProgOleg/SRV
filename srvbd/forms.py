@@ -110,6 +110,11 @@ class ShipperCreate(forms.ModelForm):
 
 # ***__Добавление запчастей в справочник__***
 class AddPart(forms.ModelForm):
+    part_num = forms.CharField(
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Введите партномер", "name": "bvz"}),
+        initial=""
+    )
+
     class Meta:
         model = models.SparPart
         fields = ["name", "part_num", "specification"]
@@ -120,10 +125,7 @@ class AddPart(forms.ModelForm):
             ),
             "specification": forms.Textarea(
                 attrs={"class": "form-control", "placeholder": "Введите описание", "rows": "4"}
-            ),
-            "part_num": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "Введите партномер", "name": "bvz"}
-            ),
+            )
         }
 
 

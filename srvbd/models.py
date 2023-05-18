@@ -41,8 +41,8 @@ class Markup(models.Model):
 
 class SparPart(models.Model):
 
-    name = models.CharField("Наименование", max_length=100)
-    part_num = JSONField(blank=False, null=True)
+    name = models.CharField("Наименование", max_length=1024)
+    part_num = models.TextField(blank=False, null=True)
     specification = models.TextField("Описание", blank=False, null=True)
 
     attachment_part = models.ForeignKey(

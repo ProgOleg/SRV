@@ -10,7 +10,7 @@
         </div>
         <hr>
         <div class="row">
-            <h4 class="ml-1">Добавление запчасти:</h2>
+            <h4 class="ml-1">Добавление запчасти:</h4>
         </div>
         <form action="{% url 'add_part_url' %}" method="post">
             {% csrf_token %}
@@ -132,6 +132,11 @@
             </div>
           </div>
         </div>
+<!--        <div class="form-group">-->
+<!--                    <label for="imageInput">Выберите картинку</label>-->
+<!--                    <input type="file" class="form-control-file" id="imageInput" accept="image/*">-->
+<!--                    <img id="imagePreview" src="#" alt="Превью картинки" style="max-width: 100%; display: none;">-->
+<!--                </div>-->
         <div class="modal fade" id="attachment_manufacturer_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -152,5 +157,65 @@
           </div>
         </div>
     </div>
+<!--    <script>-->
+<!--  // Получаем ссылки на элементы-->
+<!--  var imageInput = document.getElementById('imageInput');-->
+<!--  var imagePreview = document.getElementById('imagePreview');-->
 
+<!--  // Слушаем событие изменения значения поля ввода-->
+<!--  imageInput.addEventListener('change', function(event) {-->
+<!--    // Получаем выбранный файл-->
+<!--    var file = event.target.files[0];-->
+
+<!--    // Проверяем, что файл является изображением-->
+<!--    if (file && file.type.startsWith('image/')) {-->
+<!--      // Создаем объект FileReader-->
+<!--      var reader = new FileReader();-->
+
+<!--      // Событие загрузки файла-->
+<!--      reader.onload = function(e) {-->
+<!--        // Создаем новый объект Image-->
+<!--        var img = new Image();-->
+
+<!--        // Событие загрузки изображения-->
+<!--        img.onload = function() {-->
+<!--          // Определяем новые размеры с ограничениями-->
+<!--          var maxWidth = 505;-->
+<!--          var maxHeight = 380;-->
+<!--          var width = img.width;-->
+<!--          var height = img.height;-->
+
+<!--          // Проверяем, нужно ли изменять размеры изображения-->
+<!--          if (width > maxWidth || height > maxHeight) {-->
+<!--            var ratio = Math.min(maxWidth / width, maxHeight / height);-->
+<!--            width *= ratio;-->
+<!--            height *= ratio;-->
+<!--          }-->
+
+<!--          // Создаем элемент canvas-->
+<!--          var canvas = document.createElement('canvas');-->
+<!--          var ctx = canvas.getContext('2d');-->
+
+<!--          // Устанавливаем новые размеры-->
+<!--          canvas.width = width;-->
+<!--          canvas.height = height;-->
+
+<!--          // Рисуем изображение на canvas с новыми размерами-->
+<!--          ctx.drawImage(img, 0, 0, width, height);-->
+
+<!--          // Преобразуем canvas в Data URL и устанавливаем превью картинки-->
+<!--          var resizedImageURL = canvas.toDataURL(file.type);-->
+<!--          imagePreview.src = resizedImageURL;-->
+<!--          imagePreview.style.display = 'block';-->
+<!--        };-->
+
+<!--        // Загружаем изображение-->
+<!--        img.src = e.target.result;-->
+<!--      };-->
+
+<!--      // Читаем содержимое файла-->
+<!--      reader.readAsDataURL(file);-->
+<!--    }-->
+<!--  });-->
+<!--</script>-->
 {% endblock %}

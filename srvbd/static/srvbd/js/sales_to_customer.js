@@ -1,5 +1,13 @@
 jQuery(document).ready(function($) {
+    // модальное окно для картинок
 
+    $('#myModal').on('show.bs.modal', function(event) {
+        var button = $(event.relatedTarget); // Кнопка, на которую было нажато
+        var imageSrc = button.data('image'); // Путь к изображению
+
+        var modal = $(this);
+        modal.find('#modalImage').attr('src', imageSrc); // Устанавливаем путь к изображению в модальном окне
+      });
 	//ЖЕСТКО КОДИРОВАНЫЙ URL
 	var url_incoming = '/incoming_list/'
 	var discount = $('#discount').val()
@@ -22,9 +30,14 @@ jQuery(document).ready(function($) {
 		});
 	}
 
+	function set_total_sum(value){
+		$('#total_sum').text(value);
+	}
+
 	function renderNewDetailTableV2(data){
 		// ожидает JSON 
 		$('#new_detail_table').removeClass('remoove');
+		let total_sum = 0
 		$.each(data,function(index, el) {
 			var data_array = data[index]
 			var obj = $('<tr/>',{'id':data_array['id']});
@@ -54,7 +67,9 @@ jQuery(document).ready(function($) {
 			obj.append(knob_del);
 			obj.append(knob_hist);
 			$('#tbody_new_detail').append(obj);
+			total_sum  = total_sum + quantity * sale_price
 		});
+	set_total_sum(total_sum)
 	}
 
 
@@ -138,11 +153,15 @@ jQuery(document).ready(function($) {
 						else if (i == 'date_and_exch') {
 							foo.append($(`<a href=${url_incoming + data[index]['attach_for_incoming__id']} >${elem}</a>`))
 							obj.append(foo)
-						}
-						else {
-							foo.text(elem)
-							obj.append(foo)
-						}
+                    }
+                    else if (i === 'detail_name__image_link') {
+                        var img = $('<img>').attr('src', elem).attr('data-toggle', 'modal').attr('data-target', '#myModal').attr('data-image', elem);
+                        obj.append($('<td>').append(img));
+                    }
+                    else {
+                        foo.text(elem)
+                        obj.append(foo)
+                    }
 						
 				});
 				knob = $('<button>').attr({'type':'button','class':'btn btn-outline-info',

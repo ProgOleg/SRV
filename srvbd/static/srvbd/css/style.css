@@ -28,9 +28,16 @@ div.remoove {
 
 .table--layout--fixed {table-layout: fixed;}
 
+img {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+}
+
 @media (max-width: 767px) {
 	table[data-table-sm-css=""] td,
 	table[data-table-sm-css=""] th {
 		padding: 0.3rem;
 	}
 }
+

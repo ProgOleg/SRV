@@ -1,4 +1,12 @@
 $('document').ready(function(){
+    // модальное окно для картинок
+    $('#myModal').on('show.bs.modal', function(event) {
+        var button = $(event.relatedTarget); // Кнопка, на которую было нажато
+        var imageSrc = button.data('image'); // Путь к изображению
+
+        var modal = $(this);
+        modal.find('#modalImage').attr('src', imageSrc); // Устанавливаем путь к изображению в модальном окне
+      });
 // Рендерит таблицу с новыми запчастями если они есть в конкретном приходе.
 	var url = $('div').data('index-url')
 	$.get(url,function(data){
@@ -14,11 +22,17 @@ $('document').ready(function(){
 					if(i === 'id'){
 						return true;
 					};
-					if (i === 'incoming_price'|| i === 'quantity'){
+					if (i === 'incoming_price' || i === 'quantity'){
 						obj.append($('<td>').append(
 							$('<input/>', {
-								'type':'number','step':'0.01','value':e,'class':'input_ch form-control','name':i,'data-id':id})
-						));
+								'type':'number','step':'0.01','value':e,'class':'input_ch form-control','name':i,'data-id':id
+								}
+                            )
+			            ));
+					}
+					else if (i === 'spar_part__image_link') {
+					    var img = $('<img>').attr('src', e).attr('data-toggle', 'modal').attr('data-target', '#myModal').attr('data-image', e);
+					    obj.append($('<td>').append(img));
 					}
 					else{
 						obj.append($('<td>').text(e));
@@ -77,8 +91,14 @@ $('document').ready(function(){
 			$.each(data,function(index, el) {
 				var obj = $('<tr>')
 				$.each(this,function(index, el) {
-					//if (index !== 'id'){obj.append($('<td>').text(el))}
-					obj.append($('<td>').text(el))
+
+					if (index === 'image_link'){
+					    var img = $('<img>').attr('src', el).attr('data-toggle', 'modal').attr('data-target', '#myModal').attr('data-image', el);
+					    obj.append($('<td>').append(img));
+					} else {
+					    obj.append($('<td>').text(el));
+					}
+
 				});
 				knob = $('<button>').attr({'type':'button','class':'btn btn-outline-info',
 						'id':'but_detail','value':data[index]['id']}).text('Добавить');

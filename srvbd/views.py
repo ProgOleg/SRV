@@ -145,7 +145,18 @@ def ajax_add_specification(request):
 @login_required
 def spare_parts_manual(request):
     if request.method == "GET":
-        parts_manual_list = models.SparPart.objects.order_by("-id")
+        parts_manual_list = models.SparPart.objects.order_by(
+            "-id", "attachment_appliances__type_appliances"
+        ).values(
+            "id",
+            "name",
+            "part_num",
+            "specification",
+            "attachment_part__type_spar_part",
+            "attachment_appliances__type_appliances",
+            "attachment_manufacturer__manufacturer",
+            "image_link"
+        ).all()
         context = {"manual": parts_manual_list}
         return render(request, "srvbd/spare_parts_manual.html", context)
 
@@ -254,7 +265,7 @@ class DetailInStockView(LoginRequiredMixin, View):
             "specification_filter": forms.IncomInfoShipper(),
             "detail_filter": forms.FilterDetail(),
             "detail_count": detail_count,
-            "equal_details": equal_details["equal__sum"],
+            "equal_details": round(equal_details["equal__sum"], 2),
         }
         return render(request, "srvbd/detail_in_stock.html", context)
 
@@ -311,6 +322,7 @@ def ajax_detail_in_stock_filter(request, page):
             "detail_name__attachment_part__type_spar_part",
             "detail_name__attachment_appliances__type_appliances",
             "detail_name__attachment_manufacturer__manufacturer",
+            "detail_name__image_link",
             "incoming_price",
             "date_and_exch",
             "quantity",
@@ -327,7 +339,8 @@ def ajax_detail_in_stock_filter(request, page):
         "detail_name__id detail_name__name detail_name__part_num detail_name__specification "
         "detail_name__attachment_part__type_spar_part "
         "detail_name__attachment_appliances__type_appliances "
-        "detail_name__attachment_manufacturer__manufacturer"
+        "detail_name__attachment_manufacturer__manufacturer "
+        "detail_name__image_link"
         " date_and_exch quantity incoming_price attach_for_incoming__id",
     )
 
@@ -364,8 +377,8 @@ class CreateIncoming(LoginRequiredMixin, View):
 
 
 class EditIncoming(LoginRequiredMixin, View):
-    def get(self, request, incom_id):
 
+    def get(self, request, incom_id):
         if request.is_ajax():
             if models.DetailInIncomList.objects.filter(selector_incom_id=incom_id).first():
                 data = list(
@@ -374,6 +387,7 @@ class EditIncoming(LoginRequiredMixin, View):
                         "spar_part__name",
                         "spar_part__part_num",
                         "spar_part__specification",
+                        "spar_part__image_link",
                         "quantity",
                         "incoming_price",
                     )
@@ -397,8 +411,6 @@ class EditIncoming(LoginRequiredMixin, View):
                 return HttpResponse(status=404)
 
     def post(self, request, incom_id):
-        # import pdb
-        # pdb.set_trace()
         obj_incom = models.Incoming.objects.filter(id=incom_id)
         if obj_incom.exists():
             data = models.DetailInIncomList.objects.filter(selector_incom_id=incom_id)
@@ -454,7 +466,7 @@ def tools_ajax_create_incom_filter(request):
                 element = element[0]
             if len(element) == 0:
                 filtered_data.pop(item)
-        response_data = models.SparPart.objects.filter(**filtered_data)[:30].values(
+        response_data = models.SparPart.objects.filter(**filtered_data)[:100].values(
             "id",
             "name",
             "part_num",
@@ -462,9 +474,10 @@ def tools_ajax_create_incom_filter(request):
             "attachment_part__type_spar_part",
             "attachment_appliances__type_appliances",
             "attachment_manufacturer__manufacturer",
+            "image_link"
         )
-
-        return JsonResponse(list(response_data), safe=False)
+        response_data = list(response_data)
+        return JsonResponse(response_data, safe=False)
     else:
         return HttpResponse(status=404)
 
@@ -682,6 +695,7 @@ class SalesToCustomer(LoginRequiredMixin, View):
                 "detail_attach__detail_name__name",
                 "detail_attach__detail_name__part_num",
                 "detail_attach__detail_name__specification",
+                "detail_attach__detail_name__image_link",
                 "quantity",
                 "detail_attach__incoming_price",
                 "sale_price",
@@ -767,60 +781,7 @@ class SalesToCustomer(LoginRequiredMixin, View):
 
 @login_required
 def sales_to_customer_filter(request):
-    """
-    if request.is_ajax() and request.method == 'GET':
-    data = dict(request.GET)
-    if data:
-        set_field_name = {
-            'name':'detail_name__name__icontains','specification':'detail_name__specification__icontains',
-            'part_num':'detail_name__part_num__icontains','attachment_part': 'detail_name__attachment_part__type_spar_part',
-            'attachment_appliances': 'detail_name__attachment_appliances__type_appliances',
-            'attachment_manufacturer': 'detail_name__attachment_manufacturer__manufacturer'}
-        for item in set_field_name:
-            el = data.pop(item, None)
-            if el != None:
-                data.update({set_field_name.get(item): el[0]})
-            else:
-                return HttpResponse(status=400)
-        filtered_data = data.copy()
-        for item in data:
-            element = data.get(item)
-            if isinstance(element, list):
-                element = element[0]
-            if len(element) == 0:
-                filtered_data.pop(item)
-        filtered_data.update({'status_delete':False})
-    else:
-        filtered_data = {'status_delete':False}
-    count_quer = Detail.objects.filter(**filtered_data).count()
-    quer = Detail.objects.filter(**filtered_data).annotate(
-        date_and_exch=Concat('attach_for_incoming__incoming_date', V(' '),
-                             'attach_for_incoming__exchange_rates__exchange_rates', V('€'),
-                             output_field=CharField())).values(
-        'detail_name__id', 'detail_name__name', 'detail_name__part_num', 'detail_name__specification',
-        'detail_name__attachment_part__type_spar_part', 'detail_name__attachment_appliances__type_appliances',
-        'detail_name__attachment_manufacturer__manufacturer', 'incoming_price', 'date_and_exch', 'quantity',
-        'attach_for_incoming__id')
-    obj = Paginator(quer, 5)
-    try:
-        obj = obj.page(page)
-    except InvalidPage:
-        return HttpResponse(status=404)
-    Template = namedtuple(
-        'Detai_in_stock', 'detail_name__id detail_name__name detail_name__part_num detail_name__specification '
-                          'detail_name__attachment_part__type_spar_part '
-                          'detail_name__attachment_appliances__type_appliances '
-                          'detail_name__attachment_manufacturer__manufacturer'
-                          ' date_and_exch quantity incoming_price attach_for_incoming__id')
 
-    new_obj = [Template(**i)._asdict() for i in obj]
-    #import pdb
-    #pdb.set_trace()
-    data_ret = {'obects':new_obj,'count_obj': count_quer}
-
-    return JsonResponse(data_ret, safe=False)
-
-    """
     if request.method == "GET" and request.is_ajax():
         data = request.GET
         incom_info_chiper = forms.IncomInfoShipper(data)
@@ -884,6 +845,7 @@ def sales_to_customer_filter(request):
                 "detail_name__attachment_part__type_spar_part",
                 "detail_name__attachment_appliances__type_appliances",
                 "detail_name__attachment_manufacturer__manufacturer",
+                "detail_name__image_link",
                 "quantity",
                 "date_and_exch",
                 "incoming_price",
@@ -896,7 +858,8 @@ def sales_to_customer_filter(request):
             "id detail_name__id detail_name__name detail_name__part_num detail_name__specification "
             "detail_name__attachment_part__type_spar_part "
             "detail_name__attachment_appliances__type_appliances "
-            "detail_name__attachment_manufacturer__manufacturer"
+            "detail_name__attachment_manufacturer__manufacturer "
+            "detail_name__image_link"
             " date_and_exch quantity incoming_price  attach_for_incoming__id",
         )
         new_obj = [Template(**i)._asdict() for i in obj]
