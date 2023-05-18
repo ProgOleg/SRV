@@ -4,6 +4,7 @@ NUM_WORKERS := 2
 ENV_FILE := .env
 
 clone:
+	git checkout main
 	git pull origin main
 
 build:

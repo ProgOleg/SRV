@@ -27,6 +27,6 @@ EXPOSE 8001
 
 ENV NUM_WORKERS 2
 
-CMD ["sh", "-c", "gunicorn --workers=$NUM_WORKERS --bind 0.0.0.0:8001 mysite.wsgi"]
+CMD ["sh", "-c", "gunicorn --workers=$NUM_WORKERS --bind 0.0.0.0:8001 --log-level=debug mysite.wsgi"]
 #CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
 #CMD ["sh", "-c", "uvicorn srv_site.asgi:application --host 0.0.0.0 --port 8000 --workers $NUM_WORKERS"]
