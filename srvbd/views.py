@@ -1223,31 +1223,31 @@ class PartsReturn(LoginRequiredMixin, View):
             return HttpResponse(status=404)
 
 
-@login_required
-def print_receipt(request, invoice_id):
-    if request.method == "GET":
-        """
-        # Create a file-like buffer to receive PDF data.
-        buffer = io.BytesIO()
-
-        # Create the PDF object, using the buffer as its "file."
-        p = canvas.Canvas(buffer)
-
-        # Draw things on the PDF. Here's where the PDF generation happens.
-        # See the ReportLab documentation for the full list of functionality.
-        p.drawString(100, 100, "Hello world.")
-
-        # Close the PDF object cleanly, and we're done.
-        p.showPage()
-        p.save()
-
-        # FileResponse sets the Content-Disposition header so that browsers
-        # present the option to save the file.
-        return FileResponse(buffer, as_attachment=False, filename='hello.pdf')
-        """
-
-        results = {"obj": "Hello world!"}
-        return utils.render_to_pdf("srvbd/print.html", {"pagesize": "A4", "mylist": results})
+# @login_required
+# def print_receipt(request, invoice_id):
+#     if request.method == "GET":
+#         """
+#         # Create a file-like buffer to receive PDF data.
+#         buffer = io.BytesIO()
+#
+#         # Create the PDF object, using the buffer as its "file."
+#         p = canvas.Canvas(buffer)
+#
+#         # Draw things on the PDF. Here's where the PDF generation happens.
+#         # See the ReportLab documentation for the full list of functionality.
+#         p.drawString(100, 100, "Hello world.")
+#
+#         # Close the PDF object cleanly, and we're done.
+#         p.showPage()
+#         p.save()
+#
+#         # FileResponse sets the Content-Disposition header so that browsers
+#         # present the option to save the file.
+#         return FileResponse(buffer, as_attachment=False, filename='hello.pdf')
+#         """
+#
+#         results = {"obj": "Hello world!"}
+#         return utils.render_to_pdf("srvbd/print.html", {"pagesize": "A4", "mylist": results})
 
 
 # @login_required

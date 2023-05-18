@@ -99,7 +99,7 @@ urlpatterns = [
         views.tools_ajax_exchange_rates_usd_privat24,
         name="get_usd_exchange_rates",
     ),
-    path("print_receipt/<int:invoice_id>/", views.print_receipt, name="print_receipt_url"),
+    # path("print_receipt/<int:invoice_id>/", views.print_receipt, name="print_receipt_url"),
     path("telegram_bot/", views.telegram_bot, name="telegram_bot_url"),
     path("telegram_hook/", views.telegram_hook, name="telegram_hook_url"),
 ]

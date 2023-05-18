@@ -1,13 +1,13 @@
 import datetime
 import requests
 import json
-from io import StringIO
+# from io import StringIO
 
 from django.http import HttpResponse, JsonResponse
-from django.template.loader import get_template
+# from django.template.loader import get_template
 from django.db.models import F, Func
-from xhtml2pdf import pisa
-from html import escape
+# from xhtml2pdf import pisa
+# from html import escape
 from srvbd import models
 
 
@@ -140,17 +140,17 @@ def check_actual_sales_meterial_sales_obj(sale_person_id, material_sale_obj_id):
     )
 
 
-def render_to_pdf(template_src, context_dict):
-    template = get_template(template_src)
-    # context = Context(context_dict)
-    context = context_dict
-    html = template.render(context)
-    result = StringIO()
-
-    pdf = pisa.pisaDocument(StringIO(html.encode("ISO-8859-1")), result)
-    if not pdf.err:
-        return HttpResponse(result.getvalue(), content_type="application/pdf")
-    return HttpResponse("We had some errors<pre>%s</pre>" % escape(html))
+# def render_to_pdf(template_src, context_dict):
+#     template = get_template(template_src)
+#     # context = Context(context_dict)
+#     context = context_dict
+#     html = template.render(context)
+#     result = StringIO()
+#
+#     pdf = pisa.pisaDocument(StringIO(html.encode("ISO-8859-1")), result)
+#     if not pdf.err:
+#         return HttpResponse(result.getvalue(), content_type="application/pdf")
+#     return HttpResponse("We had some errors<pre>%s</pre>" % escape(html))
 
 
 def check_actual_sales_price(obj_pk):
