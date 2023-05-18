@@ -265,7 +265,7 @@ class DetailInStockView(LoginRequiredMixin, View):
             "specification_filter": forms.IncomInfoShipper(),
             "detail_filter": forms.FilterDetail(),
             "detail_count": detail_count,
-            "equal_details": round(equal_details["equal__sum"], 2),
+            "equal_details": round(equal_details["equal__sum"], 2) if equal_details["equal__sum"] else 0,
         }
         return render(request, "srvbd/detail_in_stock.html", context)
 
