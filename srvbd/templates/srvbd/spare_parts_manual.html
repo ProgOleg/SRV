@@ -35,7 +35,7 @@
                     <td>{{SparPart.attachment_part__type_spar_part}}</td>
                     <td>{{SparPart.attachment_appliances__type_appliances}}</td>
                     <td>{{SparPart.attachment_manufacturer__manufacturer}}</td>
-                            <td><img src="{{SparPart.image_link}}"></td>
+                            <td><img src="{{SparPart.image_link}}" data-toggle="modal" data-target="#myModal" data-image="{{SparPart.image_link}}"></td>
                   </tr>
                             {%endfor%}
                         {%endif%}
@@ -76,5 +76,18 @@
 <!--        </table>-->
 <!--      </div>-->
   </div>
+    <script>
+
+        $('document').ready(function(){
+            // модальное окно для картинок
+            $('#myModal').on('show.bs.modal', function(event) {
+                var button = $(event.relatedTarget); // Кнопка, на которую было нажато
+                var imageSrc = button.data('image'); // Путь к изображению
+
+                var modal = $(this);
+                modal.find('#modalImage').attr('src', imageSrc); // Устанавливаем путь к изображению в модальном окне
+              });
+        });
+    </script>
 {% endblock %}
 	
