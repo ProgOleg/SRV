@@ -327,7 +327,7 @@ def ajax_detail_in_stock_filter(request, page):
             "date_and_exch",
             "quantity",
             "attach_for_incoming__id",
-        )
+        ).oreder_by("detail_name__id")
     )
     obj = Paginator(quer, 5)
     try:
